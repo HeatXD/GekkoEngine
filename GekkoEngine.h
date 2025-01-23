@@ -105,7 +105,7 @@ namespace Gekko {
 
         int32_t max_character_count;
 
-        Engine(int max_characters);`
+        Engine(int max_characters);
 
         Character* GetCharacter(int index);
         Character* CreateCharacter(int max_vars, int max_states, int max_transitions);
