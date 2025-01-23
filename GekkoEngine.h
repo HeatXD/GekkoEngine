@@ -1,10 +1,17 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
+#include <functional>
 
 namespace Gekko {
+    struct Util {
+        static void SetBit(uint32_t& bitfield, int position);
+        static bool IsBitSet(const uint32_t& bitfield, int position);
+    };
 
     enum TriggerAction {
+        None = -1,
         LT,   // Less Than
         LTE,  // Less Than or Equal To
         GT,   // Greater Than
@@ -16,9 +23,12 @@ namespace Gekko {
     struct Trigger {
         TriggerAction action;
         int32_t variable_idx;
-        int32_t value;
+        int32_t trigger_value;
 
-        bool IsActive(const int32_t vars[]) const;
+        Trigger();
+        Trigger(TriggerAction act, int var_idx, int32_t trig_value);
+
+        bool IsActive(int32_t* vars) const;
     };
 
     struct Transition {
@@ -26,26 +36,32 @@ namespace Gekko {
         uint32_t to_state_id;
         Trigger trigger;
 
-        bool CanTransition(uint32_t current_id, const int32_t vars[]) const;
+        // checks whether this transition slot is available to be used.
+        bool in_use;
+
+        void Init();
+
+        bool CanTransition(uint32_t current_id, int32_t* vars) const;
     };
 
     struct State {
-        // for now a 32 bits as a bitfield should be enough 
-        // once a character has more then 32 unique transitions look at this! 
+        // checks whether this state slot is available to be used.
+        bool in_use;
+
+        // for now a 32 bit as a bitfield should be enough 
+        // once a character has more then 32 unique transitions from a single state look at this! 
         uint32_t allowed_transitions;
 
-        void (*OnEnter)();
-        void (*Update)();
-        void (*OnExit)();
+        void Init();
 
-        State();
-
-        void ToggleTransitionBit(int index);
-        bool IsTransitionBitSet(int index);
+        std::function<void()> on_enter;
+        std::function<void()> on_exit;
+        std::function<void()> on_update;
     };
 
     struct Character {
-        uint8_t* char_mem;
+        // custom character data
+        std::unique_ptr<uint8_t[]> chara_mem;
 
         int32_t* vars;
         State* states;
@@ -53,13 +69,20 @@ namespace Gekko {
 
         uint32_t current_state_id;
 
-        int32_t mem_size;
+        int32_t chara_mem_size;
 
-        int32_t num_vars;
-        int32_t num_states;
-        int32_t num_transitions;
+        int32_t max_var_count;
+        int32_t max_state_count;
+        int32_t max_transition_count;
 
-        Character(int max_vars, int max_states, int max_transitions);
+        // checks whether this character slot is available to be used.
+        bool in_use;
+
+        uint32_t frame_counter;
+
+        Character();
+
+        void Init(int max_vars, int max_states, int max_transitions);
 
         void SetVariable(int index, int32_t value);
 
@@ -67,6 +90,10 @@ namespace Gekko {
         void AddTransition(Transition* transition);
 
         void Update();
+
+    private:
+         int32_t CalcCharaSize();
+        void SetCharaOffsets();
     };
 
     struct EngineState {
@@ -74,15 +101,17 @@ namespace Gekko {
     };
 
     struct Engine {
-        Character* characters;
-        int32_t max_characters;
+        std::unique_ptr<Character[]> characters;
 
-        Engine(int max_characters);
+        int32_t max_character_count;
 
-        void AddCharacter(Character* character);
+        Engine(int max_characters);`
+
+        Character* GetCharacter(int index);
+        Character* CreateCharacter(int max_vars, int max_states, int max_transitions);
         void Update();
 
         void LoadEngineState(EngineState* state);
-        EngineState* SaveEngineState();
+        EngineState* SaveEngineState(int* state_size);
     };
 }
