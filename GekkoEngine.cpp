@@ -28,7 +28,31 @@ void Character::Update()
         movement_states[movement_state_idx].OnEnter();
     }
 
+    int32_t move_trans_count = movement_states[movement_state_idx].transitions.size();
+    for (int32_t i = 0; i < move_trans_count; i++)
+    {
+        auto& transition = movement_states[movement_state_idx].transitions[i];
+        if (transition.IsValid(this)) {
+            movement_states[movement_state_idx].OnExit();
+            movement_state_idx = transition.target_state_idx;
+            movement_states[movement_state_idx].OnEnter();
+            movement_state_frame = 0;
+            break;
+        }
+    }
 
+    int32_t combat_trans_count = combat_states[combat_state_idx].transitions.size();
+    for (int32_t i = 0; i < combat_trans_count; i++)
+    {
+        auto& transition = combat_states[combat_state_idx].transitions[i];
+        if (transition.IsValid(this)) {
+            combat_states[combat_state_idx].OnExit();
+            combat_state_idx = transition.target_state_idx;
+            combat_states[combat_state_idx].OnEnter();
+            combat_state_frame = 0;
+            break;
+        }
+    }
 
     // update frames
     movement_state_frame++;
@@ -41,4 +65,8 @@ void Character::Update()
 
 void State::AddTransition(Transition* transition)
 {
+    transitions.push_back(*transition);
+    std::sort(transitions.begin(), transitions.end(), [](Transition a, Transition b) {
+        return a.priority > b.priority;
+    });
 }

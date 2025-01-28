@@ -14,18 +14,13 @@ struct Transition {
     uint16_t target_state_idx;
 
     virtual bool IsValid(Character* ctx) { return false; };
-
-    bool operator<(const Transition& other) const {
-        // Sort in descending order
-        return priority > other.priority;
-    }
 };
 
 struct State {
     std::vector<Transition> transitions;
 
-    bool interrupt_combat_state;
-    bool interrupt_movement_state;
+    bool interrupt_combat_state = false;
+    bool interrupt_movement_state = false;
 
     virtual void OnEnter() { std::cout << "Entering base state\n"; }
     virtual void OnUpdate() { std::cout << "Updating base state\n"; }
