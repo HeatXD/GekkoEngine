@@ -73,3 +73,27 @@ void CharacterBehaviour::Init(int num_vars, int num_combat_states, int num_movem
     combat_states = std::make_unique<State[]>(max_combat_states);
     movement_states = std::make_unique<State[]>(max_movement_states);
 }
+
+CharacterBehaviour::CharacterBehaviour()
+{
+    max_vars = 0;
+    max_combat_states = 0;
+    max_movement_states = 0;
+}
+
+std::unordered_map<std::string, const CharacterBehaviour*>& Engine::GetCharacterRegister()
+{
+    static std::unordered_map<std::string, const CharacterBehaviour*> map;
+    return map;
+}
+
+void Engine::RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour)
+{
+    auto& map = GetCharacterRegister();
+    map[name] = behaviour;
+}
+
+int Engine::NumRegisteredCharacters()
+{
+    return GetCharacterRegister().size();
+}

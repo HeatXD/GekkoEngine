@@ -5,6 +5,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <unordered_map>
 
 struct Character;
 
@@ -36,6 +37,8 @@ struct CharacterBehaviour {
     uint16_t max_combat_states;
     uint16_t max_movement_states;
 
+    CharacterBehaviour();
+
     void Init(int num_vars, int num_combat_states, int num_movement_states);
 };
 
@@ -58,5 +61,8 @@ private:
 };
 
 struct Engine {
+    static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();
+    static void RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour);
 
+    int NumRegisteredCharacters();
 };
