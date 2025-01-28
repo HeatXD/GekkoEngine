@@ -2,6 +2,17 @@
 
 #include <algorithm>
 
+Character::Character()
+{
+    combat_state_frame = 0;
+    movement_state_frame = 0;
+
+    combat_state_idx = UINT16_MAX;
+    movement_state_idx = UINT16_MAX;
+
+    base = nullptr;
+}
+
 void Character::Init(const CharacterBehaviour* bhvr)
 {
     base = bhvr;
@@ -96,4 +107,31 @@ void Engine::RegisterCharacterBehaviour(std::string name, const CharacterBehavio
 int Engine::NumRegisteredCharacters()
 {
     return GetCharacterRegister().size();
+}
+
+void Engine::CreateCharacterInstance(std::string chara_name, int player_controller)
+{
+    player_controller; // todo
+    
+    auto& map = GetCharacterRegister();
+
+    if (map.count(chara_name) == 0) {
+        return;
+    }
+    
+    // add new character
+    characters.push_back(Character());
+    auto& chara = characters.back();
+    
+    // give it the requesed behaviour
+    chara.Init(map.at(chara_name));
+}
+
+void Engine::Update()
+{
+    int num_chara = characters.size();
+    for (int i = 0; i < num_chara; i++)
+    {
+        characters[i].Update();
+    }
 }

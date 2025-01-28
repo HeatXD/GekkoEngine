@@ -13,7 +13,7 @@ struct Transition {
     int32_t priority;
     uint16_t target_state_idx;
 
-    std::function<bool(Character* ctx)> IsValid;
+    std::function<bool(Character* ctx)> IsValid = [](Character* ctx) { return false; };
 };
 
 struct State {
@@ -22,9 +22,9 @@ struct State {
     bool interrupt_combat_state = false;
     bool interrupt_movement_state = false;
 
-    std::function<void(Character* ctx)> OnEnter;
-    std::function<void(Character* ctx)> OnUpdate;
-    std::function<void(Character* ctx)> OnExit;
+    std::function<void(Character* ctx)> OnEnter = [](Character* ctx) {};
+    std::function<void(Character* ctx)> OnUpdate = [](Character* ctx) {};
+    std::function<void(Character* ctx)> OnExit = [](Character* ctx) {};
 
     void AddTransition(Transition* transition);
 };
@@ -53,6 +53,8 @@ struct Character {
     uint32_t combat_state_frame;
     uint32_t movement_state_frame;
 
+    Character();
+
     void Init(const CharacterBehaviour* bhvr);
     void Update();
 
@@ -61,8 +63,14 @@ private:
 };
 
 struct Engine {
+    std::vector<Character> characters;
+
     static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();
     static void RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour);
 
     int NumRegisteredCharacters();
+
+    void CreateCharacterInstance(std::string chara_name, int player_controller);
+
+    void Update();
 };
