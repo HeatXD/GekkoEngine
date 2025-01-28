@@ -1,117 +1,54 @@
 #pragma once
 
-#include <cstdint>
+#include <iostream>
 #include <memory>
+#include <string>
 #include <functional>
+#include <vector>
+#include <algorithm>
 
-namespace Gekko {
-    struct Util {
-        static void SetBit(uint32_t& bitfield, int position);
-        static bool IsBitSet(const uint32_t& bitfield, int position);
-    };
+struct Character;
 
-    enum TriggerAction {
-        None = -1,
-        LT,   // Less Than
-        LTE,  // Less Than or Equal To
-        GT,   // Greater Than
-        GTE,  // Greater Than or Equal To
-        EQ,   // Equal To
-        NEQ   // Not Equal To
-    };
+struct Transition {
+    int32_t priority;
+    uint16_t target_state_idx;
 
-    struct Trigger {
-        TriggerAction action;
-        int32_t variable_idx;
-        int32_t trigger_value;
+    virtual bool IsValid(Character* ctx) { return false; };
 
-        Trigger();
-        Trigger(TriggerAction act, int var_idx, int32_t trig_value);
+    bool operator<(const Transition& other) const {
+        // Sort in descending order
+        return priority > other.priority;
+    }
+};
 
-        bool IsActive(int32_t* vars) const;
-    };
+struct State {
+    std::vector<Transition> transitions;
 
-    struct Transition {
-        uint32_t from_state_id;
-        uint32_t to_state_id;
-        Trigger trigger;
+    bool interrupt_combat_state;
+    bool interrupt_movement_state;
 
-        // checks whether this transition slot is available to be used.
-        bool in_use;
+    virtual void OnEnter() { std::cout << "Entering base state\n"; }
+    virtual void OnUpdate() { std::cout << "Updating base state\n"; }
+    virtual void OnExit() { std::cout << "Exiting base state\n"; }
 
-        void Init();
+    void AddTransition(Transition* transition);
+};
 
-        bool CanTransition(uint32_t current_id, int32_t* vars) const;
-    };
+struct Character {
+    std::unique_ptr<int32_t[]> vars;
+    std::unique_ptr<State[]> combat_states;
+    std::unique_ptr<State[]> movement_states;
 
-    struct State {
-        // checks whether this state slot is available to be used.
-        bool in_use;
+    uint16_t max_vars;
+    uint16_t max_combat_states;
+    uint16_t max_movement_states;
 
-        // for now a 32 bit as a bitfield should be enough 
-        // once a character has more then 32 unique transitions from a single state look at this! 
-        uint32_t allowed_transitions;
+    uint16_t combat_state_idx;
+    uint16_t movement_state_idx;
 
-        void Init();
+    uint32_t combat_state_frame;
+    uint32_t movement_state_frame;
 
-        std::function<void()> on_enter;
-        std::function<void()> on_exit;
-        std::function<void()> on_update;
-    };
-
-    struct Character {
-        // custom character data
-        std::unique_ptr<uint8_t[]> chara_mem;
-
-        int32_t* vars;
-        State* states;
-        Transition* transitions;
-
-        uint32_t current_state_id;
-
-        int32_t chara_mem_size;
-
-        int32_t max_var_count;
-        int32_t max_state_count;
-        int32_t max_transition_count;
-
-        // checks whether this character slot is available to be used.
-        bool in_use;
-
-        uint32_t frame_counter;
-
-        Character();
-
-        void Init(int max_vars, int max_states, int max_transitions);
-
-        void SetVariable(int index, int32_t value);
-
-        void AddState(State* state);
-        void AddTransition(Transition* transition);
-
-        void Update();
-
-    private:
-         int32_t CalcCharaSize();
-        void SetCharaOffsets();
-    };
-
-    struct EngineState {
-
-    };
-
-    struct Engine {
-        std::unique_ptr<Character[]> characters;
-
-        int32_t max_character_count;
-
-        Engine(int max_characters);
-
-        Character* GetCharacter(int index);
-        Character* CreateCharacter(int max_vars, int max_states, int max_transitions);
-        void Update();
-
-        void LoadEngineState(EngineState* state);
-        EngineState* SaveEngineState(int* state_size);
-    };
-}
+    void Init(int num_vars, int num_combat_states, int num_movement_states);
+    void Update();
+};
