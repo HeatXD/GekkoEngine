@@ -3,9 +3,39 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <functional>
 #include <vector>
 #include <unordered_map>
+
+#include <utility>
+#include <type_traits>
+
+template<typename T>
+class GekkoFunc;
+
+template<typename R, typename... Args>
+class GekkoFunc<R(Args...)> {
+    R(*fn_ptr)(Args...) = nullptr;
+
+public:
+    GekkoFunc() = default;
+
+    template<typename F>
+    GekkoFunc(F f) : fn_ptr(f) {}  // Implicit conversion allowed
+
+    R operator()(Args... args) const {
+        if (fn_ptr) {
+            if constexpr (std::is_void_v<R>) {
+                fn_ptr(std::forward<Args>(args)...);
+            }
+            else {
+                return fn_ptr(std::forward<Args>(args)...);
+            }
+        }
+        if constexpr (!std::is_void_v<R>) return R{};
+    }
+
+    explicit operator bool() const { return fn_ptr != nullptr; }
+};
 
 struct Character;
 
@@ -13,7 +43,7 @@ struct Transition {
     int32_t priority;
     uint16_t target_state_idx;
 
-    std::function<bool(Character* ctx)> IsValid = [](Character* ctx) { return false; };
+    GekkoFunc<bool(Character*)> IsValid;
 };
 
 struct State {
@@ -22,9 +52,9 @@ struct State {
     bool interrupt_combat_state = false;
     bool interrupt_movement_state = false;
 
-    std::function<void(Character* ctx)> OnEnter = [](Character* ctx) {};
-    std::function<void(Character* ctx, uint32_t frame)> OnUpdate = [](Character* ctx, uint32_t frame) {};
-    std::function<void(Character* ctx)> OnExit = [](Character* ctx) {};
+    GekkoFunc<void(Character*)> OnEnter;
+    GekkoFunc<void(Character*, uint32_t)> OnUpdate;
+    GekkoFunc<void(Character*)> OnExit;
 
     void AddTransition(Transition* transition);
 };
