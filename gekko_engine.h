@@ -9,32 +9,37 @@
 #include <utility>
 #include <type_traits>
 
-template<typename T>
+template<typename>
 class GekkoFunc;
 
 template<typename R, typename... Args>
 class GekkoFunc<R(Args...)> {
-    R(*fn_ptr)(Args...) = nullptr;
+    using FuncPtr = R(*)(Args...);
+    FuncPtr fn_ptr = nullptr;
+
+    static_assert(std::is_void_v<R> ||
+        (std::is_default_constructible_v<R> && !std::is_reference_v<R>),
+        "Return type must be void or non-reference default-constructible type");
 
 public:
-    GekkoFunc() = default;
+    GekkoFunc() noexcept = default;
+    GekkoFunc(FuncPtr ptr) noexcept : fn_ptr(ptr) {}  // Direct function pointer
 
-    template<typename F>
-    GekkoFunc(F f) : fn_ptr(f) {}  // Implicit conversion allowed
+    template<typename F, typename = std::enable_if_t<
+        std::is_convertible_v<F, FuncPtr>
+        >>
+        GekkoFunc(F f) noexcept : fn_ptr(f) {}  // Safe conversion
 
     R operator()(Args... args) const {
         if (fn_ptr) {
-            if constexpr (std::is_void_v<R>) {
-                fn_ptr(std::forward<Args>(args)...);
-            }
-            else {
-                return fn_ptr(std::forward<Args>(args)...);
-            }
+            return fn_ptr(std::forward<Args>(args)...);
         }
-        if constexpr (!std::is_void_v<R>) return R{};
+        if constexpr (!std::is_void_v<R>) {
+            return R{};  // Safe default return
+        }
     }
 
-    explicit operator bool() const { return fn_ptr != nullptr; }
+    explicit operator bool() const noexcept { return fn_ptr != nullptr; }
 };
 
 struct Character;
