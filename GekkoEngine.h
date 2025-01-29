@@ -23,7 +23,7 @@ struct State {
     bool interrupt_movement_state = false;
 
     std::function<void(Character* ctx)> OnEnter = [](Character* ctx) {};
-    std::function<void(Character* ctx)> OnUpdate = [](Character* ctx) {};
+    std::function<void(Character* ctx, uint32_t frame)> OnUpdate = [](Character* ctx, uint32_t frame) {};
     std::function<void(Character* ctx)> OnExit = [](Character* ctx) {};
 
     void AddTransition(Transition* transition);

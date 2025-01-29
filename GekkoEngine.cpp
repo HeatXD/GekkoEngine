@@ -49,8 +49,8 @@ void Character::Update()
     combat_state_frame++;
 
     // update current states
-    base->movement_states[movement_state_idx].OnUpdate(this);
-    base->combat_states[combat_state_idx].OnUpdate(this);
+    base->movement_states[movement_state_idx].OnUpdate(this, movement_state_frame);
+    base->combat_states[combat_state_idx].OnUpdate(this, combat_state_frame);
 }
 
 void Character::HandleStateTransition(uint16_t& state_idx, uint32_t& state_frame, const State* states)

@@ -11,8 +11,8 @@ void BuildBehaviour_ExampleCharacter() {
         std::cout << "Entering Walk State\n";
         ctx->vars[0] = 10; // Set timer for Walk
         };
-    walkState.OnUpdate = [](Character* ctx) {
-        std::cout << "Walking...\n";
+    walkState.OnUpdate = [](Character* ctx, uint32_t frame) {
+        std::cout << "Walking(" << frame << ") ...\n";
         ctx->vars[0]--; // Decrement the timer
         };
     walkState.OnExit = [](Character* ctx) {
@@ -25,8 +25,8 @@ void BuildBehaviour_ExampleCharacter() {
         std::cout << "Entering Run State\n";
         ctx->vars[0] = 20; // Set timer for Run
         };
-    runState.OnUpdate = [](Character* ctx) {
-        std::cout << "Running...\n";
+    runState.OnUpdate = [](Character* ctx, uint32_t frame) {
+        std::cout << "Running(" << frame << ") ...\n";
         ctx->vars[0]--; // Decrement the timer
         };
     runState.OnExit = [](Character* ctx) {
@@ -39,8 +39,8 @@ void BuildBehaviour_ExampleCharacter() {
         std::cout << "Entering Jump State\n";
         ctx->vars[0] = 10; // Set timer for Jump
         };
-    jumpState.OnUpdate = [](Character* ctx) {
-        std::cout << "Jumping...\n";
+    jumpState.OnUpdate = [](Character* ctx, uint32_t frame) {
+        std::cout << "Jumping(" << frame << ") ...\n";
         ctx->vars[0]--; // Decrement the timer
         };
     jumpState.OnExit = [](Character* ctx) {
@@ -53,8 +53,8 @@ void BuildBehaviour_ExampleCharacter() {
         std::cout << "Entering Fall State\n";
         ctx->vars[0] = 10; // Set timer for Fall
         };
-    fallState.OnUpdate = [](Character* ctx) {
-        std::cout << "Falling...\n";
+    fallState.OnUpdate = [](Character* ctx, uint32_t frame) {
+        std::cout << "Falling(" << frame <<") ...\n";
         ctx->vars[0]--; // Decrement the timer
         };
     fallState.OnExit = [](Character* ctx) {
