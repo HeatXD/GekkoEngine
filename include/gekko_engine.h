@@ -9,6 +9,8 @@
 #include <utility>
 #include <type_traits>
 
+#include "gekko_math.h"
+
 template<typename>
 class GekkoFunc;
 
@@ -53,9 +55,6 @@ struct Transition {
 
 struct State {
     std::vector<Transition> transitions;
-
-    bool interrupt_combat_state = false;
-    bool interrupt_movement_state = false;
 
     GekkoFunc<void(Character*)> OnEnter;
     GekkoFunc<void(Character*, uint32_t)> OnUpdate;

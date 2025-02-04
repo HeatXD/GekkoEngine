@@ -134,6 +134,8 @@ void Engine::Update()
     {
         characters[i].Update();
     }
+
+    physics.Update();
 }
 
 void PhysicsModule::Update()
