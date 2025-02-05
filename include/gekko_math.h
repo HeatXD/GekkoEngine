@@ -12,9 +12,9 @@ namespace Gekko::Math {
         int32_t _raw;
 
     public:
-        static constexpr int32_t ONE = 0x4000;
-        static constexpr int32_t MAX = 131071;
-        static constexpr int32_t MIN = -131071;
+        static const int32_t ONE = 0x4000;
+        static const int32_t MAX = 131071;
+        static const int32_t MIN = -131071;
 
         Unit() : _raw(0) {}
         Unit(int32_t val) : _raw(val) {}
@@ -28,8 +28,18 @@ namespace Gekko::Math {
             return Unit(_raw + other._raw);
         }
 
+        Unit& operator+=(const Unit& other) {
+            _raw += other._raw;
+            return *this;
+        }
+
         Unit operator-(const Unit& other) const {
             return Unit(_raw - other._raw);
+        }
+
+        Unit& operator-=(const Unit& other) {
+            _raw -= other._raw;
+            return *this;
         }
 
         Unit operator/(const Unit& other) const {
@@ -37,8 +47,8 @@ namespace Gekko::Math {
                 throw std::runtime_error("Division by zero");
             }
             int64_t num = static_cast<int64_t>(_raw) * ONE;
-            int64_t adjust = (static_cast<int64_t>(std::abs(other._raw) / 2)) * (other._raw >= 0 ? 1 : -1);
-            return Unit((num + adjust) / other._raw);
+            int64_t adjust = std::abs(other._raw) / 2;
+            return Unit((num + (other._raw > 0 ? adjust : -adjust)) / other._raw);
         }
 
         Unit operator*(const Unit& other) const {
@@ -51,22 +61,131 @@ namespace Gekko::Math {
         }
 
         bool operator!=(const Unit& other) const {
-            return !(*this == other);
+            return _raw != other._raw;
         }
 
-        float AsFloat() const {
+        Unit& operator*=(const Unit& other) {
+            *this = *this * other;
+            return *this;
+        }
+
+        Unit& operator/=(const Unit& other) {
+            *this = *this / other;
+            return *this;
+        }
+
+        // VISUALIZATION ONLY
+        inline float AsFloat() const {
             return static_cast<float>(_raw) / ONE;
         }
     };
 
+    // VISUALIZATION ONLY
+    struct Vec3F {
+        float x, y, z;
+        Vec3F(float xx, float yy, float zz) : x(xx), y(yy), z(zz) {}
+    };
+
     struct Vec3 {
         Unit x, y, z;
+
+        Vec3() : x(), y(), z() {}
+        Vec3(const Unit& xx, const Unit& yy, const Unit& zz) : x(xx), y(yy), z(zz) {}
+
+        Vec3 operator+(const Vec3& other) const {
+            return Vec3(x + other.x, y + other.y, z + other.z);
+        }
+
+        Vec3& operator+=(const Vec3& other) {
+            *this = *this + other;
+            return *this;
+        }
+
+        Vec3 operator+(const Unit& other) const {
+            return Vec3(x + other, y + other, z + other);
+        }
+
+        Vec3& operator+=(const Unit& other) {
+            *this = *this + other;
+            return *this;
+        }
+
+        Vec3 operator-(const Vec3& other) const {
+            return Vec3(x - other.x, y - other.y, z - other.z);
+        }
+
+        Vec3& operator-=(const Vec3& other) {
+            *this = *this - other;
+            return *this;
+        }
+
+        Vec3 operator-(const Unit& other) const {
+            return Vec3(x - other, y - other, z - other);
+        }
+
+        Vec3& operator-=(const Unit& other) {
+            *this = *this - other;
+            return *this;
+        }
+
+        Vec3 operator/(const Vec3& other) const {
+            return Vec3(x / other.x, y / other.y, z / other.z);
+        }
+
+        Vec3 operator/(const Unit& other) const {
+            return Vec3(x / other, y / other, z / other);
+        }
+
+        Vec3& operator/=(const Vec3& other) {
+            *this = *this / other;
+            return *this;
+        }
+
+        Vec3& operator/=(const Unit& other) {
+            *this = *this / other;
+            return *this;
+        }
+
+        Vec3 operator*(const Vec3& other) const {
+            return Vec3(x * other.x, y * other.y, z * other.z);
+        }
+
+        Vec3 operator*(const Unit& other) const {
+            return Vec3(x * other, y * other, z * other);
+        }
+
+        Vec3& operator*=(const Vec3& other) {
+            *this = *this * other;
+            return *this;
+        }
+
+        Vec3& operator*=(const Unit& other) {
+            *this = *this * other;
+            return *this;
+        }
+
+        bool operator==(const Vec3& other) const {
+            return x == other.x && y == other.y && z == other.z;
+        }
+
+        bool operator!=(const Vec3& other) const {
+            return !(*this == other);
+        }
+
+        Vec3F AsFloat() const {
+            return Vec3F(x.AsFloat(), y.AsFloat(), z.AsFloat());
+        }
     };
 }
 
 namespace Gekko::Math::Test {
 
     static void TestUnit() {
+
+        static bool alreadyRun = false;
+        if (alreadyRun) return;  // Prevent multiple runs
+        alreadyRun = true;
+
         Unit u1 = Unit::FromInt(5);
         Unit u2 = Unit::FromInt(3);
         Unit u3 = Unit::FromInt(-10);
