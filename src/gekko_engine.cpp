@@ -132,10 +132,10 @@ void Engine::Update()
     int num_chara = characters.size();
     for (int i = 0; i < num_chara; i++)
     {
-        characters[i].Update();
+    //    characters[i].Update();
     }
 
-    physics.Update();
+   // physics.Update();
 }
 
 void PhysicsModule::Update()
