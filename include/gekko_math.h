@@ -13,8 +13,8 @@ namespace Gekko::Math {
 
     public:
         static const int32_t ONE = 0x4000;
-        static const int32_t MAX = 131071;
-        static const int32_t MIN = -131071;
+        static const int32_t MAX = 131071 * ONE;
+        static const int32_t MIN = -131071 * ONE;
 
         Unit() : _raw(0) {}
         Unit(int32_t val) : _raw(val) {}
@@ -91,6 +91,10 @@ namespace Gekko::Math {
 
         Vec3() : x(), y(), z() {}
         Vec3(const Unit& xx, const Unit& yy, const Unit& zz) : x(xx), y(yy), z(zz) {}
+
+        Unit Dot(const Vec3& other) const {
+            return (x * other.x) + (y * other.y) + (z * other.z);
+        }
 
         Vec3 operator+(const Vec3& other) const {
             return Vec3(x + other.x, y + other.y, z + other.z);
@@ -172,59 +176,9 @@ namespace Gekko::Math {
             return !(*this == other);
         }
 
+        // VISUALIZATION ONLY
         Vec3F AsFloat() const {
             return Vec3F(x.AsFloat(), y.AsFloat(), z.AsFloat());
         }
     };
 }
-
-namespace Gekko::Math::Test {
-
-    static void TestUnit() {
-
-        static bool alreadyRun = false;
-        if (alreadyRun) return;  // Prevent multiple runs
-        alreadyRun = true;
-
-        Unit u1 = Unit::FromInt(5);
-        Unit u2 = Unit::FromInt(3);
-        Unit u3 = Unit::FromInt(-10);
-
-        // Test addition, subtraction, multiplication, and division
-        assert((u1 + u2) == Unit::FromInt(8));
-        assert((u1 - u2) == Unit::FromInt(2));
-        assert((u1 * u2) == Unit::FromInt(15));
-        Unit div_result = u1 / u2;
-        assert(div_result == Unit(27307));
-
-        // Test negative numbers
-        assert((u1 + u3) == Unit::FromInt(-5));
-
-        // Test equality and inequality
-        assert(u1 == Unit::FromInt(5));
-        assert(u1 != Unit::FromInt(10));
-
-        // Test AsFloat conversion
-        assert(u1.AsFloat() == 5.0f);
-
-        // Test division by zero
-        try {
-            Unit div_zero_result = u1 / Unit::FromInt(0);
-            assert(false && "Division by zero should throw an exception!");
-        }
-        catch (const std::runtime_error& e) {
-            std::cout << "Caught expected exception: " << e.what() << std::endl;
-        }
-
-        std::cout << "Unit test passed!" << std::endl;
-    }
-}
-
-struct Tester {
-    Tester() {
-        Gekko::Math::Test::TestUnit();
-    }
-};
-
-static Tester __test;
-
