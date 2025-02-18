@@ -12,15 +12,14 @@ namespace Gekko::Math {
         int32_t _raw;
 
     public:
-        static const int32_t ONE = 0x4000;
-        static const int32_t MAX = 131071 * ONE;
-        static const int32_t MIN = -131071 * ONE;
+        static const int32_t ONE = 0x8000;
+        static const int32_t HALF = 0x4000;
 
         Unit() : _raw(0) {}
         Unit(int32_t val) : _raw(val) {}
         Unit(const Unit& val) : _raw(val._raw) {}
 
-        static Unit FromInt(int32_t val) {
+        static Unit From(int32_t val) {
             return Unit(val * ONE);
         }
 
@@ -90,6 +89,7 @@ namespace Gekko::Math {
         Unit x, y, z;
 
         Vec3() : x(), y(), z() {}
+        Vec3(const Vec3& v) : x(v.x), y(v.y), z(v.z) {}
         Vec3(const Unit& xx, const Unit& yy, const Unit& zz) : x(xx), y(yy), z(zz) {}
 
         Unit Dot(const Vec3& other) const {
@@ -181,4 +181,65 @@ namespace Gekko::Math {
             return Vec3F(x.AsFloat(), y.AsFloat(), z.AsFloat());
         }
     };
+
+//---------------------------------
+// Physics/Collision Engine Section
+//---------------------------------
+#ifndef GEKKO_MATH_NO_PHYSICS
+
+    // ==== Todo / Goals ====
+    // - Sphere, Capsule (,Diamond) Collision Detection
+    // - Sphere, Capsule (,Diamond) Collision Resolution
+    // - Collision Layers
+    // - Collision Events
+    // - Modifiable Physics World Origin
+    // - Easily Saved and Loaded World State
+
+    struct PhysicsBody {
+        Vec3 velocity;
+        Vec3 acceleration;
+    };
+
+    enum ObjectType
+    {
+        OSphere,
+        OCapsule,
+        ODiamond,
+    };
+
+    struct Sphere;
+    struct Capsule;
+    struct Diamond;
+
+    struct Object {
+        ObjectType type;
+        int32_t body_index;
+        int32_t shape_index;
+    };
+
+    struct Sphere {
+        Vec3 position;
+        Unit radius;
+    };
+
+    struct PhysicsWorld {
+    private:
+        Vec3 _origin;
+
+        std::vector<Object> _objects;
+        std::vector<PhysicsBody> _bodies;
+
+        std::vector<Sphere> _spheres;
+        std::vector<Capsule> _capsules;
+        std::vector<Diamond> _diamonds;
+
+    public:
+        PhysicsWorld() : _origin(Unit::HALF, Unit::HALF, Unit::HALF) {};
+
+        void SetOrigin(const Vec3& origin) {
+            _origin = origin;
+        };
+    };
+
+#endif // !GEKKO_MATH_NO_PHYSICS
 }

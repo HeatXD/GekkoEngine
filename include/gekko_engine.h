@@ -96,15 +96,8 @@ private:
     void HandleStateTransition(uint16_t& state_idx, uint32_t& state_frame, const State* states);
 };
 
-struct PhysicsModule
-{
-    void Update();
-};
-
 struct Engine {
     std::vector<Character> characters;
-
-    PhysicsModule physics;
 
     static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();
     static void RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour);
