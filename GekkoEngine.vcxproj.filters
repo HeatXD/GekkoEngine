@@ -35,5 +35,11 @@
     <ClInclude Include="include\gekko_math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\gekko_ds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\gekko_physics.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

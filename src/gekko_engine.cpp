@@ -2,6 +2,8 @@
 
 #include <algorithm>
 
+using namespace Gekko::Engine;
+
 Character::Character()
 {
     combat_state_frame = 0;
@@ -106,7 +108,7 @@ void Engine::RegisterCharacterBehaviour(std::string name, const CharacterBehavio
 
 int Engine::NumRegisteredCharacters()
 {
-    return GetCharacterRegister().size();
+    return (int)GetCharacterRegister().size();
 }
 
 void Engine::CreateCharacterInstance(std::string chara_name, int player_controller)

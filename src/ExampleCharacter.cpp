@@ -1,5 +1,7 @@
 ﻿#include "gekko_engine.h"
 
+using namespace Gekko::Engine;
+
 std::unique_ptr<CharacterBehaviour> ExampleCharacter;
 
 void BuildBehaviour_ExampleCharacter() {

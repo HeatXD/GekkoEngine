@@ -3,108 +3,74 @@
 #include <iostream>
 #include <memory>
 #include <string>
-#include <vector>
 #include <unordered_map>
 
-#include <utility>
-#include <type_traits>
+#include "gekko_ds.h"
 
-#include "gekko_math.h"
+namespace Gekko::Engine {
 
-template<typename>
-class GekkoFunc;
+    struct Character;
 
-template<typename R, typename... Args>
-class GekkoFunc<R(Args...)> {
-    using FuncPtr = R(*)(Args...);
-    FuncPtr fn_ptr = nullptr;
+    struct Transition {
+        int32_t priority;
+        uint16_t target_state_idx;
 
-    static_assert(std::is_void_v<R> ||
-        (std::is_default_constructible_v<R> && !std::is_reference_v<R>),
-        "Return type must be void or non-reference default-constructible type");
+        DS::Function<bool(Character*)> IsValid;
+    };
 
-public:
-    GekkoFunc() noexcept = default;
-    GekkoFunc(FuncPtr ptr) noexcept : fn_ptr(ptr) {}  // Direct function pointer
+    struct State {
+        DS::Vec<Transition> transitions;
 
-    template<typename F, typename = std::enable_if_t<
-        std::is_convertible_v<F, FuncPtr>
-        >>
-        GekkoFunc(F f) noexcept : fn_ptr(f) {}  // Safe conversion
+        DS::Function<void(Character*)> OnEnter;
+        DS::Function<void(Character*, uint32_t)> OnUpdate;
+        DS::Function<void(Character*)> OnExit;
 
-    R operator()(Args... args) const {
-        if (fn_ptr) {
-            return fn_ptr(std::forward<Args>(args)...);
-        }
-        if constexpr (!std::is_void_v<R>) {
-            return R{};  // Safe default return
-        }
-    }
+        void AddTransition(Transition* transition);
+    };
 
-    explicit operator bool() const noexcept { return fn_ptr != nullptr; }
-};
+    struct CharacterBehaviour {
+        std::unique_ptr<State[]> combat_states;
+        std::unique_ptr<State[]> movement_states;
 
-struct Character;
+        uint16_t max_vars;
+        uint16_t max_combat_states;
+        uint16_t max_movement_states;
 
-struct Transition {
-    int32_t priority;
-    uint16_t target_state_idx;
+        CharacterBehaviour();
 
-    GekkoFunc<bool(Character*)> IsValid;
-};
+        void Init(int num_vars, int num_combat_states, int num_movement_states);
+    };
 
-struct State {
-    std::vector<Transition> transitions;
+    struct Character {
+        std::unique_ptr<int32_t[]> vars;
 
-    GekkoFunc<void(Character*)> OnEnter;
-    GekkoFunc<void(Character*, uint32_t)> OnUpdate;
-    GekkoFunc<void(Character*)> OnExit;
+        const CharacterBehaviour* base;
 
-    void AddTransition(Transition* transition);
-};
+        uint16_t combat_state_idx;
+        uint16_t movement_state_idx;
 
-struct CharacterBehaviour {
-    std::unique_ptr<State[]> combat_states;
-    std::unique_ptr<State[]> movement_states;
+        uint32_t combat_state_frame;
+        uint32_t movement_state_frame;
 
-    uint16_t max_vars;
-    uint16_t max_combat_states;
-    uint16_t max_movement_states;
+        Character();
 
-    CharacterBehaviour();
+        void Init(const CharacterBehaviour* bhvr);
+        void Update();
 
-    void Init(int num_vars, int num_combat_states, int num_movement_states);
-};
+    private:
+        void HandleStateTransition(uint16_t& state_idx, uint32_t& state_frame, const State* states);
+    };
 
-struct Character {
-    std::unique_ptr<int32_t[]> vars;
+    struct Engine {
+        DS::Vec<Character> characters;
 
-    const CharacterBehaviour* base;
+        static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();
+        static void RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour);
 
-    uint16_t combat_state_idx;
-    uint16_t movement_state_idx;
+        int NumRegisteredCharacters();
 
-    uint32_t combat_state_frame;
-    uint32_t movement_state_frame;
+        void CreateCharacterInstance(std::string chara_name, int player_controller);
 
-    Character();
-
-    void Init(const CharacterBehaviour* bhvr);
-    void Update();
-
-private:
-    void HandleStateTransition(uint16_t& state_idx, uint32_t& state_frame, const State* states);
-};
-
-struct Engine {
-    std::vector<Character> characters;
-
-    static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();
-    static void RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour);
-
-    int NumRegisteredCharacters();
-
-    void CreateCharacterInstance(std::string chara_name, int player_controller);
-
-    void Update();
-};
+        void Update();
+    };
+}

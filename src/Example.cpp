@@ -4,6 +4,7 @@
 #include <thread>
 
 int main() {
+    using namespace Gekko::Engine;
     using namespace std::chrono_literals;
 
     Engine en;

@@ -47,7 +47,7 @@ namespace Gekko::Math {
             }
             int64_t num = static_cast<int64_t>(_raw) * ONE;
             int64_t adjust = std::abs(other._raw) / 2;
-            return Unit((num + (other._raw > 0 ? adjust : -adjust)) / other._raw);
+            return Unit((int32_t)(num + (other._raw > 0 ? adjust : -adjust)) / other._raw);
         }
 
         Unit operator*(const Unit& other) const {
@@ -182,65 +182,36 @@ namespace Gekko::Math {
         }
     };
 
-//---------------------------------
-// Physics/Collision Engine Section
-//---------------------------------
-#ifndef GEKKO_MATH_NO_PHYSICS
+    template<typename>
+    class Function;
 
-    // ==== Todo / Goals ====
-    // - Sphere, Capsule (,Diamond) Collision Detection
-    // - Sphere, Capsule (,Diamond) Collision Resolution
-    // - Collision Layers
-    // - Collision Events
-    // - Modifiable Physics World Origin
-    // - Easily Saved and Loaded World State
+    template<typename R, typename... Args>
+    class Function<R(Args...)> {
+        using FuncPtr = R(*)(Args...);
+        FuncPtr fn_ptr = nullptr;
 
-    struct Sphere;
-    struct Capsule;
-    struct Diamond;
-
-    struct Object {
-        enum Type {
-            Sphere = 1,
-            Capsule,
-            Diamond,
-        } type;
-
-        int32_t body_index;
-        int32_t shape_index;
-
-        uint32_t active_layers;
-    };
-
-    struct Body {
-        Vec3 velocity;
-        Vec3 acceleration;
-    };
-
-    struct Sphere {
-        Vec3 position;
-        Unit radius;
-    };
-
-    struct PhysicsWorld {
-    private:
-        Vec3 _origin;
-
-        std::vector<Object> _objects;
-
-        std::vector<Body> _bodies;
-
-        std::vector<Sphere> _spheres;
-        std::vector<Capsule> _capsules;
-        std::vector<Diamond> _diamonds;
+        static_assert(std::is_void_v<R> ||
+            (std::is_default_constructible_v<R> && !std::is_reference_v<R>),
+            "Return type must be void or non-reference default-constructible type");
 
     public:
-        PhysicsWorld() : _origin(Unit::HALF, Unit::HALF, Unit::HALF) {};
+        Function() noexcept = default;
+        Function(FuncPtr ptr) noexcept : fn_ptr(ptr) {}  // Direct function pointer
 
-        void SetOrigin(const Vec3& origin) {
-            _origin = origin;
-        };
+        template<typename F, typename = std::enable_if_t<
+            std::is_convertible_v<F, FuncPtr>
+            >>
+            Function(F f) noexcept : fn_ptr(f) {}  // Safe conversion
+
+        R operator()(Args... args) const {
+            if (fn_ptr) {
+                return fn_ptr(std::forward<Args>(args)...);
+            }
+            if constexpr (!std::is_void_v<R>) {
+                return R{};  // Safe default return
+            }
+        }
+
+        explicit operator bool() const noexcept { return fn_ptr != nullptr; }
     };
-
-#endif // !GEKKO_MATH_NO_PHYSICS
 }

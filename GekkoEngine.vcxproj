@@ -137,8 +137,10 @@
     <ClCompile Include="src\TestMath.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\gekko_ds.h" />
     <ClInclude Include="include\gekko_engine.h" />
     <ClInclude Include="include\gekko_math.h" />
+    <ClInclude Include="include\gekko_physics.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
