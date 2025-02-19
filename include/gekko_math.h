@@ -195,26 +195,26 @@ namespace Gekko::Math {
     // - Modifiable Physics World Origin
     // - Easily Saved and Loaded World State
 
-    struct PhysicsBody {
-        Vec3 velocity;
-        Vec3 acceleration;
-    };
-
-    enum ObjectType
-    {
-        OSphere,
-        OCapsule,
-        ODiamond,
-    };
-
     struct Sphere;
     struct Capsule;
     struct Diamond;
 
     struct Object {
-        ObjectType type;
+        enum Type {
+            Sphere = 1,
+            Capsule,
+            Diamond,
+        } type;
+
         int32_t body_index;
         int32_t shape_index;
+
+        uint32_t active_layers;
+    };
+
+    struct Body {
+        Vec3 velocity;
+        Vec3 acceleration;
     };
 
     struct Sphere {
@@ -227,7 +227,8 @@ namespace Gekko::Math {
         Vec3 _origin;
 
         std::vector<Object> _objects;
-        std::vector<PhysicsBody> _bodies;
+
+        std::vector<Body> _bodies;
 
         std::vector<Sphere> _spheres;
         std::vector<Capsule> _capsules;
