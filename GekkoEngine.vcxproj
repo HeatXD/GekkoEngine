@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\gekko_physics.cpp" />
     <ClCompile Include="src\Example.cpp" />
     <ClCompile Include="src\ExampleCharacter.cpp" />
     <ClCompile Include="src\gekko_engine.cpp" />

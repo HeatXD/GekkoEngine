@@ -86,6 +86,8 @@ namespace Gekko::Math {
     };
 
     struct Vec3 {
+        static const Vec3 ZERO;
+
         Unit x, y, z;
 
         Vec3() : x(), y(), z() {}

@@ -18,7 +18,7 @@ namespace Gekko::Physics {
 
     struct Object {
         enum Type : uint16_t {
-            Sphere = 1,
+            Sphere,
             Capsule,
             Diamond,
         } type;
@@ -54,7 +54,7 @@ namespace Gekko::Physics {
 
     struct Diamond {};
 
-    struct PhysicsWorld {
+    struct World {
     private:
         Math::Vec3 _origin;
 
@@ -73,7 +73,7 @@ namespace Gekko::Physics {
         DS::Vec<Diamond> _diamonds;
 
         // book keeping
-        // we want to try and reuse as much of the preallocated buffers as we can
+        // we also want to try and reuse as much of the preallocated buffers as we can
         DS::Vec<int16_t> _zombie_bodies;
         DS::Vec<int16_t> _zombie_groups;
         DS::Vec<int16_t> _zombie_objects;
@@ -83,10 +83,12 @@ namespace Gekko::Physics {
         DS::Vec<int16_t> _zombie_diamonds;
 
     public:
-        PhysicsWorld() : _origin(Math::Unit::HALF, Math::Unit::HALF, Math::Unit::HALF) {};
+        World();
 
-        void SetOrigin(const Math::Vec3& origin) {
-            _origin = origin;
-        };
+        void SetOrigin(const Math::Vec3& origin);
+
+        int16_t CreateBody(bool static_body);
+
+        bool DestroyBody(int16_t body_id);
     };
 }

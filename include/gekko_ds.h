@@ -83,6 +83,15 @@ namespace Gekko::DS {
 
         void clear() { _size = 0; }
 
+        int32_t contains(const T& value) const {
+            for (uint32_t i = 0; i < _size; i++) {
+                if (_data[i] == value) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         T* data() { return _data; }
         T* begin() { return _data; }
         T* end() { return _data + _size; }
