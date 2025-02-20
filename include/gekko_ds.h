@@ -39,20 +39,23 @@ namespace Gekko::DS {
         explicit operator bool() const noexcept { return fn_ptr != nullptr; }
     };
 
-
     template <typename T>
     struct Vec {
+        static_assert(std::is_trivially_copyable_v<T>, "DS::Vec<T> only supports trivially copyable types");
+
     private:
         T* _data = nullptr;
-        uint32_t _size = 0;
-        uint32_t _capacity = 0;
+        uint32_t _size = 0, _capacity = 0;
 
-        void alloc(uint16_t new_capacity) {
+        void grow() {
+            uint32_t new_capacity = _capacity ? _capacity * 2 : 8;
             T* new_data = new T[new_capacity];
+
             if (_data) {
-                std::memcpy(new_data, _data, _size * sizeof(T)); // Copy old data
-                delete[] _data; // Free old memory
+                std::memcpy(new_data, _data, _size * sizeof(T));
+                delete[] _data;
             }
+
             _data = new_data;
             _capacity = new_capacity;
         }
@@ -61,29 +64,30 @@ namespace Gekko::DS {
         ~Vec() { delete[] _data; }
 
         void push_back(const T& value) {
-            if (_size == _capacity) alloc(_capacity ? _capacity * 2 : 8);
+            if (_size == _capacity) grow();
             _data[_size++] = value;
         }
 
         void pop_back() { if (_size) _size--; }
 
-        T& operator[](uint32_t index) {
-            if (index >= _size) throw std::out_of_range("Index out of range");
-            return _data[index];
-        }
+        T& back() { return _data[_size - 1]; }
+        const T& back() const { return _data[_size - 1]; }
 
-        const T& operator[](uint32_t index) const {
-            if (index >= _size) throw std::out_of_range("Index out of range");
-            return _data[index];
-        }
+        T& operator[](uint32_t i) { return _data[i]; }
+        const T& operator[](uint32_t i) const { return _data[i]; }
 
-        inline uint32_t size() const { return _size; }
+        uint32_t size() const { return _size; }
         uint32_t capacity() const { return _capacity; }
+
         bool empty() const { return _size == 0; }
 
         void clear() { _size = 0; }
 
         T* data() { return _data; }
-    };
+        T* begin() { return _data; }
+        T* end() { return _data + _size; }
 
+        const T* begin() const { return _data; }
+        const T* end() const { return _data + _size; }
+    };
 } // namespace Gekko::DS

@@ -132,8 +132,7 @@ void Engine::CreateCharacterInstance(std::string chara_name, int player_controll
 void Engine::Update()
 {
     int num_chara = characters.size();
-    for (int i = 0; i < num_chara; i++)
-    {
-    //    characters[i].Update();
+    for (int i = 0; i < num_chara; i++) {
+        characters[i].Update();
     }
 }

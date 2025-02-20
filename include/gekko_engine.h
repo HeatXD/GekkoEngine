@@ -62,7 +62,7 @@ namespace Gekko::Engine {
     };
 
     struct Engine {
-        DS::Vec<Character> characters;
+        std::vector<Character> characters;
 
         static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();
         static void RegisterCharacterBehaviour(std::string name, const CharacterBehaviour* behaviour);

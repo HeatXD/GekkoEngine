@@ -47,7 +47,7 @@ namespace Gekko::Math {
             }
             int64_t num = static_cast<int64_t>(_raw) * ONE;
             int64_t adjust = std::abs(other._raw) / 2;
-            return Unit((int32_t)(num + (other._raw > 0 ? adjust : -adjust)) / other._raw);
+            return Unit(static_cast<int32_t>((num + (other._raw > 0 ? adjust : -adjust)) / other._raw));
         }
 
         Unit operator*(const Unit& other) const {
@@ -180,38 +180,5 @@ namespace Gekko::Math {
         Vec3F AsFloat() const {
             return Vec3F(x.AsFloat(), y.AsFloat(), z.AsFloat());
         }
-    };
-
-    template<typename>
-    class Function;
-
-    template<typename R, typename... Args>
-    class Function<R(Args...)> {
-        using FuncPtr = R(*)(Args...);
-        FuncPtr fn_ptr = nullptr;
-
-        static_assert(std::is_void_v<R> ||
-            (std::is_default_constructible_v<R> && !std::is_reference_v<R>),
-            "Return type must be void or non-reference default-constructible type");
-
-    public:
-        Function() noexcept = default;
-        Function(FuncPtr ptr) noexcept : fn_ptr(ptr) {}  // Direct function pointer
-
-        template<typename F, typename = std::enable_if_t<
-            std::is_convertible_v<F, FuncPtr>
-            >>
-            Function(F f) noexcept : fn_ptr(f) {}  // Safe conversion
-
-        R operator()(Args... args) const {
-            if (fn_ptr) {
-                return fn_ptr(std::forward<Args>(args)...);
-            }
-            if constexpr (!std::is_void_v<R>) {
-                return R{};  // Safe default return
-            }
-        }
-
-        explicit operator bool() const noexcept { return fn_ptr != nullptr; }
     };
 }
