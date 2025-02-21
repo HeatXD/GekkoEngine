@@ -59,28 +59,18 @@ namespace Gekko::Physics {
         Math::Vec3 _origin;
 
         // physics bodies 
-        DS::Vec<Body> _bodies;
+        DS::SparseSet<int16_t, Body> _bodies;
 
         // collision object groups
-        DS::Vec<ObjectGroup> _groups;
+        DS::SparseSet<int16_t, ObjectGroup> _groups;
 
         // collision objects
-        DS::Vec<Object> _objects;
+        DS::SparseSet<int16_t, Object> _objects;
 
         // collision shapes
-        DS::Vec<Sphere> _spheres;
-        DS::Vec<Capsule> _capsules;
-        DS::Vec<Diamond> _diamonds;
-
-        // book keeping
-        // we also want to try and reuse as much of the preallocated buffers as we can
-        DS::Vec<int16_t> _zombie_bodies;
-        DS::Vec<int16_t> _zombie_groups;
-        DS::Vec<int16_t> _zombie_objects;
-
-        DS::Vec<int16_t> _zombie_spheres;
-        DS::Vec<int16_t> _zombie_capsules;
-        DS::Vec<int16_t> _zombie_diamonds;
+        DS::SparseSet<int16_t, Sphere> _spheres;
+        DS::SparseSet<int16_t, Capsule> _capsules;
+        DS::SparseSet<int16_t, Diamond> _diamonds;
 
     public:
         World();

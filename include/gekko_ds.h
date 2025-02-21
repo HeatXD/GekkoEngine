@@ -99,4 +99,176 @@ namespace Gekko::DS {
         const T* begin() const { return _data; }
         const T* end() const { return _data + _size; }
     };
+
+    template <typename Q, typename T>
+    class SparseSet {
+        static_assert(std::is_signed_v<Q>, "SparseSet<Q, T> requires Q to be a signed integer");
+        static_assert(std::is_trivially_copyable_v<T>, "SparseSet<Q, T> requires T to be trivially copyable");
+
+        Vec<T> dense;
+        Vec<Q> sparse;
+        Vec<Q> entities;
+        Vec<Q> free_ids;
+        Vec<uint32_t> enabled;
+
+        Q next_id = 0;
+        Q active_count = 0;
+
+        // Consolidated index validation
+        bool is_valid(Q id) const {
+            return id >= 0 && id < sparse.size() && sparse[id] != INVALID_ID && entities[sparse[id]] == id;
+        }
+
+        // Centralized bit manipulation
+        void set_bit(Q index, bool value) {
+            ensure_enabled_size(index);
+            uint32_t& bitset = enabled[index / 32];
+            uint32_t mask = (1u << (index % 32));
+            if (value) {
+                bitset |= mask;
+            }
+            else {
+                bitset &= ~mask;
+            }
+        }
+
+        void ensure_enabled_size(Q id) {
+            Q required_size = (id / 32) + 1;
+            while (enabled.size() < required_size) {
+                enabled.push_back(0);
+            }
+        }
+
+        bool is_bit_enabled(Q index) const {
+            return index / 32 < enabled.size() && (enabled[index / 32] & (1u << (index % 32)));
+        }
+
+        // Centralized swap logic for dense and entities vectors
+        void swap_dense(Q index1, Q index2) {
+            std::swap(dense[index1], dense[index2]);
+            std::swap(entities[index1], entities[index2]);
+            sparse[entities[index1]] = index1;
+            sparse[entities[index2]] = index2;
+        }
+
+    public:
+        static constexpr Q INVALID_ID = static_cast<Q>(-1);
+
+        Q insert(const T& value) {
+            Q id;
+            if (!free_ids.empty()) {
+                id = free_ids.back();
+                free_ids.pop_back();
+            }
+            else {
+                id = next_id++;
+                if (next_id < 0) return INVALID_ID;
+            }
+
+            if (id >= sparse.size()) {
+                while (id >= sparse.size()) {
+                    sparse.push_back(INVALID_ID);
+                }
+            }
+
+            sparse[id] = dense.size();
+            dense.push_back(value);
+            entities.push_back(id);
+            set_bit(id, true);
+            active_count++;
+            return id;
+        }
+
+        void remove(Q id) {
+            if (!is_valid(id)) return;
+
+            Q index = sparse[id];
+            Q last_index = dense.size() - 1;
+
+            if (is_bit_enabled(id)) {
+                active_count--;
+            }
+
+            if (index != last_index) {
+                swap_dense(index, last_index);
+            }
+
+            dense.pop_back();
+            entities.pop_back();
+
+            sparse[id] = INVALID_ID;
+            free_ids.push_back(id);
+            set_bit(id, false);
+        }
+
+        void enable(Q id) {
+            if (is_valid(id) && !is_enabled(id)) {
+                Q index = sparse[id];
+                Q first_inactive = active_count;
+
+                swap_dense(index, first_inactive);
+
+                set_bit(id, true);
+                active_count++;
+            }
+        }
+
+        void disable(Q id) {
+            if (is_valid(id) && is_enabled(id)) {
+                Q index = sparse[id];
+                Q last_active = active_count - 1;
+
+                swap_dense(index, last_active);
+
+                set_bit(id, false);
+                active_count--;
+            }
+        }
+
+        bool is_enabled(Q id) const {
+            return is_valid(id) && is_bit_enabled(id);
+        }
+
+        bool contains(Q id) const {
+            return is_valid(id);
+        }
+
+        T& get(Q id) {
+            if (!is_valid(id) || !is_enabled(id)) {
+                throw std::out_of_range("Invalid or Disabled ID");
+            }
+            return dense[sparse[id]];
+        }
+
+        const T& get(Q id) const {
+            if (!is_valid(id) || !is_enabled(id)) {
+                throw std::out_of_range("Invalid or Disabled ID");
+            }
+            return dense[sparse[id]];
+        }
+
+        void clear() {
+            dense.clear();
+            entities.clear();
+            sparse.clear();
+            free_ids.clear();
+            enabled.clear();
+            next_id = 0;
+            active_count = 0;
+        }
+
+        Q size() const {
+            return static_cast<Q>(dense.size());
+        }
+
+        Q active_size() const {
+            return active_count;
+        }
+
+        T* begin() { return dense.begin(); }
+        T* end() { return dense.begin() + active_count; }
+        const T* begin() const { return dense.begin(); }
+        const T* end() const { return dense.begin() + active_count; }
+    };
+
 } // namespace Gekko::DS

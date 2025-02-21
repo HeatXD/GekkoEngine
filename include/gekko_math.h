@@ -15,9 +15,9 @@ namespace Gekko::Math {
         static const int32_t ONE = 0x8000;
         static const int32_t HALF = 0x4000;
 
-        Unit() : _raw(0) {}
+        Unit() = default;
         Unit(int32_t val) : _raw(val) {}
-        Unit(const Unit& val) : _raw(val._raw) {}
+        Unit(const Unit& val) = default;
 
         static Unit From(int32_t val) {
             return Unit(val * ONE);
@@ -90,8 +90,8 @@ namespace Gekko::Math {
 
         Unit x, y, z;
 
-        Vec3() : x(), y(), z() {}
-        Vec3(const Vec3& v) : x(v.x), y(v.y), z(v.z) {}
+        Vec3() = default;
+        Vec3(const Vec3& v) = default;
         Vec3(const Unit& xx, const Unit& yy, const Unit& zz) : x(xx), y(yy), z(zz) {}
 
         Unit Dot(const Vec3& other) const {
