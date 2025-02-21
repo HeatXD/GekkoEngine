@@ -135,6 +135,7 @@
     <ClCompile Include="src\Example.cpp" />
     <ClCompile Include="src\ExampleCharacter.cpp" />
     <ClCompile Include="src\gekko_engine.cpp" />
+    <ClCompile Include="src\TestDS.cpp" />
     <ClCompile Include="src\TestMath.cpp" />
   </ItemGroup>
   <ItemGroup>

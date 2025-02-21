@@ -9,11 +9,11 @@ using namespace Gekko::Math;
 
 struct TestMath {
     // Helper for comparing floats within a tolerance.
-    static bool AlmostEqual(float a, float b, float epsilon = 1e-4f) {
+    bool AlmostEqual(float a, float b, float epsilon = 1e-4f) {
         return std::fabs(a - b) < epsilon;
     }
 
-    static void TestUnitArithmetic() {
+    void TestUnitArithmetic() {
         // Test From and AsFloat conversion using tolerance for float comparisons.
         {
             Unit u = Unit::From(5);
@@ -86,7 +86,7 @@ struct TestMath {
         }
     }
 
-    static void TestVec3Arithmetic() {
+    void TestVec3Arithmetic() {
         // Test constructor and equality
         {
             Vec3 v(Unit::From(1), Unit::From(2), Unit::From(3));
@@ -201,7 +201,7 @@ struct TestMath {
     TestMath() {
         TestUnitArithmetic();
         TestVec3Arithmetic();
-        std::cout << "All tests passed.\n";
+        std::cout << "All math tests passed.\n";
     }
 };
 
