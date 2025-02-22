@@ -4,6 +4,10 @@ Gekko::Physics::World::World() : _origin(Math::Unit::HALF, Math::Unit::HALF, Mat
 {
 }
 
+Gekko::Physics::World::~World()
+{
+}
+
 void Gekko::Physics::World::SetOrigin(const Math::Vec3& origin)
 {
     _origin = origin;

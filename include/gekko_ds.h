@@ -41,10 +41,9 @@ namespace Gekko::DS {
 
     // A simple dynamic array for trivially copyable types.
     template <typename T>
-    struct Vec {
+    class Vec {
         static_assert(std::is_trivially_copyable_v<T>, "DS::Vec<T> only supports trivially copyable types");
 
-    private:
         T* _data = nullptr;
         uint32_t _size = 0, _capacity = 0;
 
@@ -59,16 +58,37 @@ namespace Gekko::DS {
             _capacity = new_capacity;
         }
 
+        void free_pointers() {
+            if constexpr (std::is_pointer_v<T>) {
+                for (uint32_t i = 0; i < _size; ++i) {
+                    delete _data[i];
+                    _data[i] = nullptr;
+                }
+            }
+        }
+
     public:
-        ~Vec() { delete[] _data; }
+        ~Vec() {
+            free_pointers();
+            delete[] _data;
+        }
 
         void push_back(const T& value) {
-            if (_size == _capacity)
+            if (_size == _capacity) {
                 grow();
+            }
             _data[_size++] = value;
         }
 
-        void pop_back() { if (_size) _size--; }
+        void pop_back() {
+            if (_size > 0) {
+                if constexpr (std::is_pointer_v<T>) {
+                    delete _data[_size - 1];
+                    _data[_size - 1] = nullptr;
+                }
+                _size--;
+            }
+        }
 
         T& back() { return _data[_size - 1]; }
         const T& back() const { return _data[_size - 1]; }
@@ -78,8 +98,13 @@ namespace Gekko::DS {
 
         uint32_t size() const { return _size; }
         uint32_t capacity() const { return _capacity; }
+
         bool empty() const { return _size == 0; }
-        void clear() { _size = 0; }
+
+        void clear() {
+            free_pointers();
+            _size = 0;
+        }
 
         T* data() { return _data; }
         T* begin() { return _data; }
@@ -96,6 +121,7 @@ namespace Gekko::DS {
     class SparseSet {
         static_assert(std::is_integral_v<Q>, "DS::SparseSet<Q, T> requires Q to be an integral type");
         static_assert(std::is_signed_v<Q>, "DS::SparseSet<Q, T> requires Q to be signed because -1 is used as INVALID_ID");
+        static_assert(std::is_trivially_copyable_v<T>, "DS::SparseSet<Q, T> requires T to be trivially copyable");
 
         Vec<T> dense;       // Stores the actual data.
 
@@ -143,8 +169,9 @@ namespace Gekko::DS {
             }
             else {
                 id = next_id;
-                if (next_id == INVALID_ID)
+                if (next_id == INVALID_ID) {
                     return INVALID_ID; // No more IDs available.
+                }
                 next_id++;
             }
 

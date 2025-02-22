@@ -32,7 +32,7 @@ namespace Gekko::Physics {
         uint16_t resolve_layers;
         uint16_t react_layers;
 
-        // int16_t group_index;
+        int16_t object_list_id;
     };
 
     struct Body {
@@ -42,7 +42,7 @@ namespace Gekko::Physics {
         Math::Vec3 velocity;
         Math::Vec3 acceleration;
 
-        // DS::Vec<int16_t> groups;
+        int16_t group_list_id;
     };
 
     struct Sphere {
@@ -68,12 +68,17 @@ namespace Gekko::Physics {
         DS::SparseSet<int16_t, Object> _objects;
 
         // collision shapes
-        DS::Vec<Sphere> _spheres;
-        DS::Vec<Capsule> _capsules;
-        DS::Vec<Diamond> _diamonds;
+        DS::SparseSet<int16_t, Sphere> _spheres;
+        DS::SparseSet<int16_t, Capsule> _capsules;
+        DS::SparseSet<int16_t, Diamond> _diamonds;
+
+        // id registery
+        DS::SparseSet<int16_t, DS::Vec<int16_t>*> _id_reg;
 
     public:
         World();
+
+        ~World();
 
         void SetOrigin(const Math::Vec3& origin);
 
