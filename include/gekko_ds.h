@@ -145,8 +145,7 @@ namespace Gekko::DS {
 
         // Checks if the given id is valid (allocated and not removed).
         bool is_valid(Q id) const {
-            if (id < 0)
-                return false;
+            if (id < 0) return false;
             uint32_t index = static_cast<uint32_t>(id);
             return index < sparse.size() && sparse[index] != INVALID_ID;
         }
@@ -195,8 +194,9 @@ namespace Gekko::DS {
 
         // Removes an entity from the set.
         void remove(Q id) {
-            if (!is_valid(id))
+            if (!is_valid(id)) {
                 return;
+            }
 
             Q index = sparse[id];
             Q last_index = dense.size() - 1;
@@ -261,7 +261,7 @@ namespace Gekko::DS {
             active_count = 0;
         }
 
-        // Returns the total number of entities (active + disabled).
+        // Returns the total number of entities (active(enabled) + active(disabled) + free).
         Q size() const { return static_cast<Q>(dense.size()); }
 
         // Returns the number of active (enabled) entities.

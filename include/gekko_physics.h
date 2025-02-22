@@ -23,7 +23,7 @@ namespace Gekko::Physics {
             Diamond,
         } type;
 
-        int16_t shape_index;
+        int16_t shape_id;
     };
 
     struct ObjectGroup {
@@ -38,11 +38,11 @@ namespace Gekko::Physics {
     struct Body {
         bool is_static;
 
+        int16_t group_list_id;
+
         Math::Vec3 position;
         Math::Vec3 velocity;
         Math::Vec3 acceleration;
-
-        int16_t group_list_id;
     };
 
     struct Sphere {
