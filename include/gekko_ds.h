@@ -94,8 +94,8 @@ namespace Gekko::DS {
     // Removed IDs are stored in free_ids for reuse.
     template <typename Q, typename T>
     class SparseSet {
-        static_assert(std::is_integral_v<Q>, "SparseSet<Q, T> requires Q to be an integral type");
-        static_assert(std::is_signed_v<Q>, "SparseSet<Q, T> requires Q to be signed because -1 is used as INVALID_ID");
+        static_assert(std::is_integral_v<Q>, "DS::SparseSet<Q, T> requires Q to be an integral type");
+        static_assert(std::is_signed_v<Q>, "DS::SparseSet<Q, T> requires Q to be signed because -1 is used as INVALID_ID");
 
         Vec<T> dense;       // Stores the actual data.
 
@@ -125,7 +125,6 @@ namespace Gekko::DS {
             return index < sparse.size() && sparse[index] != INVALID_ID;
         }
 
-  
         bool is_enabled(Q id) const {
             return is_valid(id) && (sparse[id] < active_count);
         }
@@ -174,8 +173,10 @@ namespace Gekko::DS {
 
             Q index = sparse[id];
             Q last_index = dense.size() - 1;
-            if (is_enabled(id))
+
+            if (is_enabled(id)) {
                 active_count--;
+            }
 
             if (index != last_index) {
                 swap_dense(index, last_index);

@@ -1,6 +1,7 @@
 #include <iostream>
-#include <cstring>  // For std::memcmp
+#include <cstring>
 #include <cassert>
+
 #include "gekko_ds.h"
 
 using namespace Gekko::DS;
