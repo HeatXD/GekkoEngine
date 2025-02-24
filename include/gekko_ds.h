@@ -90,6 +90,25 @@ namespace Gekko::DS {
             }
         }
 
+        void remove_at(uint32_t index) {
+            if (index >= _size) return;
+            // swap with the last element
+            if (index != _size - 1) {
+                std::swap(_data[index], _data[_size - 1]);
+            }
+            // pop off the last element
+            pop_back();
+        }
+
+        void remove_first(const T& value) {
+            for (uint32_t i = 0; i < size(); i++){
+                if (_data[i] == value) {
+                    remove_at(i);
+                    return;
+                }
+            }
+        }
+
         T& back() { return _data[_size - 1]; }
         const T& back() const { return _data[_size - 1]; }
 
@@ -113,31 +132,31 @@ namespace Gekko::DS {
         const T* end() const { return _data + _size; }
     };
 
-    // SparseSet manages a collection of entities and their associated data.
+    // SparseSet manages a collection of _entities and their associated data.
     // It uses a signed integer type for IDs, with -1 representing an invalid ID.
-    // Active entities are stored contiguously at the beginning of the dense vector.
-    // Removed IDs are stored in free_ids for reuse.
+    // Active _entities are stored contiguously at the beginning of the _dense vector.
+    // Removed IDs are stored in _free_ids for reuse.
     template <typename Q, typename T>
     class SparseSet {
         static_assert(std::is_integral_v<Q>, "DS::SparseSet<Q, T> requires Q to be an integral type");
         static_assert(std::is_signed_v<Q>, "DS::SparseSet<Q, T> requires Q to be signed because -1 is used as INVALID_ID");
         static_assert(std::is_trivially_copyable_v<T>, "DS::SparseSet<Q, T> requires T to be trivially copyable");
 
-        Vec<T> dense;       // Stores the actual data.
+        Vec<T> _dense;       // Stores the actual data.
 
-        Vec<Q> sparse;      // Maps entity ID to its index in the dense vector.
-        Vec<Q> entities;    // Maps dense index back to its entity ID.
-        Vec<Q> free_ids;    // List of IDs available for reuse.
+        Vec<Q> _sparse;      // Maps entity ID to its index in the dense vector.
+        Vec<Q> _entities;    // Maps dense index back to its entity ID.
+        Vec<Q> _free_ids;    // List of IDs available for reuse.
 
-        Q next_id = 0;      // Next new ID to assign.
-        Q active_count = 0; // Number of active (enabled) entities.
+        Q _next_id = 0;      // Next new ID to assign.
+        Q _active_count = 0; // Number of active (enabled) _entities.
 
-        // Swap the entries at two indices in the dense vector (and update the mapping).
+        // Swap the entries at two indices in the _dense vector (and update the mapping).
         void swap_dense(Q index1, Q index2) {
-            std::swap(dense[index1], dense[index2]);
-            std::swap(entities[index1], entities[index2]);
-            sparse[entities[index1]] = index1;
-            sparse[entities[index2]] = index2;
+            std::swap(_dense[index1], _dense[index2]);
+            std::swap(_entities[index1], _entities[index2]);
+            _sparse[_entities[index1]] = index1;
+            _sparse[_entities[index2]] = index2;
         }
 
     public:
@@ -147,11 +166,11 @@ namespace Gekko::DS {
         bool is_valid(Q id) const {
             if (id < 0) return false;
             uint32_t index = static_cast<uint32_t>(id);
-            return index < sparse.size() && sparse[index] != INVALID_ID;
+            return index < _sparse.size() && _sparse[index] != INVALID_ID;
         }
 
         bool is_enabled(Q id) const {
-            return is_valid(id) && (sparse[id] < active_count);
+            return is_valid(id) && (_sparse[id] < _active_count);
         }
 
         // Returns true if the set contains the given entity (i.e. if it is valid).
@@ -162,33 +181,33 @@ namespace Gekko::DS {
         // Inserts a new element; new elements start as active.
         Q insert(const T& value) {
             Q id;
-            if (!free_ids.empty()) {
-                id = free_ids.back();
-                free_ids.pop_back();
+            if (!_free_ids.empty()) {
+                id = _free_ids.back();
+                _free_ids.pop_back();
             }
             else {
-                id = next_id;
-                if (next_id == INVALID_ID) {
+                id = _next_id;
+                if (_next_id == INVALID_ID) {
                     return INVALID_ID; // No more IDs available.
                 }
-                next_id++;
+                _next_id++;
             }
 
             // Ensure the sparse vector is large enough.
-            while (static_cast<uint32_t>(id) >= sparse.size()) {
-                sparse.push_back(INVALID_ID);
+            while (static_cast<uint32_t>(id) >= _sparse.size()) {
+                _sparse.push_back(INVALID_ID);
             }
 
             // Map the new entity to its dense index.
-            sparse[id] = dense.size();
-            dense.push_back(value);
-            entities.push_back(id);
+            _sparse[id] = _dense.size();
+            _dense.push_back(value);
+            _entities.push_back(id);
 
             // Swap the new element into the active region.
-            if (sparse[id] != active_count) {
-                swap_dense(sparse[id], active_count);
+            if (_sparse[id] != _active_count) {
+                swap_dense(_sparse[id], _active_count);
             }
-            active_count++;
+            _active_count++;
             return id;
         }
 
@@ -198,41 +217,41 @@ namespace Gekko::DS {
                 return;
             }
 
-            Q index = sparse[id];
-            Q last_index = dense.size() - 1;
+            Q index = _sparse[id];
+            Q last_index = _dense.size() - 1;
 
             if (is_enabled(id)) {
-                active_count--;
+                _active_count--;
             }
 
             if (index != last_index) {
                 swap_dense(index, last_index);
             }
 
-            dense.pop_back();
-            entities.pop_back();
+            _dense.pop_back();
+            _entities.pop_back();
 
-            sparse[id] = INVALID_ID;
+            _sparse[id] = INVALID_ID;
 
-            free_ids.push_back(id);
+            _free_ids.push_back(id);
         }
 
         // Disables an active entity
         void disable(Q id) {
             if (is_valid(id) && is_enabled(id)) {
-                Q index = sparse[id];
-                Q last_active = active_count - 1;
+                Q index = _sparse[id];
+                Q last_active = _active_count - 1;
                 swap_dense(index, last_active);
-                active_count--;
+                _active_count--;
             }
         }
 
         // Enables a disabled entity
         void enable(Q id) {
             if (is_valid(id) && !is_enabled(id)) {
-                Q index = sparse[id];
-                swap_dense(index, active_count);
-                active_count++;
+                Q index = _sparse[id];
+                swap_dense(index, _active_count);
+                _active_count++;
             }
         }
 
@@ -241,39 +260,39 @@ namespace Gekko::DS {
             if (!is_valid(id) || !is_enabled(id)) {
                 throw std::out_of_range("Invalid or Disabled ID");
             }
-            return dense[sparse[id]];
+            return _dense[_sparse[id]];
         }
 
         const T& get(Q id) const {
             if (!is_valid(id) || !is_enabled(id)) {
                 throw std::out_of_range("Invalid or Disabled ID");
             }
-            return dense[sparse[id]];
+            return _dense[_sparse[id]];
         }
 
-        // Clears all entities.
+        // Clears all _entities.
         void clear() {
-            dense.clear();
-            entities.clear();
-            sparse.clear();
-            free_ids.clear();
-            next_id = 0;
-            active_count = 0;
+            _dense.clear();
+            _entities.clear();
+            _sparse.clear();
+            _free_ids.clear();
+            _next_id = 0;
+            _active_count = 0;
         }
 
         // Returns the total number of entities (active(enabled) + active(disabled) + free).
-        Q size() const { return static_cast<Q>(dense.size()); }
+        Q size() const { return static_cast<Q>(_dense.size()); }
 
         // Returns the number of active (enabled) entities.
-        Q active_size() const { return active_count; }
+        Q active_size() const { return _active_count; }
 
         // Returns the number of active (disabled) entities.
-        Q disabled_size() const { return static_cast<Q>(dense.size()) - active_count; }
+        Q disabled_size() const { return static_cast<Q>(_dense.size()) - _active_count; }
 
         // Iterators over active entities.
-        T* begin() { return dense.begin(); }
-        T* end() { return dense.begin() + active_count; }
-        const T* begin() const { return dense.begin(); }
-        const T* end() const { return dense.begin() + active_count; }
+        T* begin() { return _dense.begin(); }
+        T* end() { return _dense.begin() + _active_count; }
+        const T* begin() const { return _dense.begin(); }
+        const T* end() const { return _dense.begin() + _active_count; }
     };
 } // namespace Gekko::DS

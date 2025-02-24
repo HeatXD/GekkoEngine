@@ -32,17 +32,17 @@ namespace Gekko::Physics {
         uint16_t resolve_layers;
         uint16_t react_layers;
 
-        int16_t object_list_id;
+        DS::Vec<int16_t>* object_ids;
     };
 
     struct Body {
         bool is_static;
 
-        int16_t group_list_id;
-
         Math::Vec3 position;
         Math::Vec3 velocity;
         Math::Vec3 acceleration;
+
+        DS::Vec<int16_t>* group_ids;
     };
 
     struct Sphere {
@@ -72,18 +72,25 @@ namespace Gekko::Physics {
         DS::SparseSet<int16_t, Capsule> _capsules;
         DS::SparseSet<int16_t, Diamond> _diamonds;
 
-        // id registery
-        DS::SparseSet<int16_t, DS::Vec<int16_t>*> _id_reg;
-
     public:
         World();
 
-        ~World();
-
         void SetOrigin(const Math::Vec3& origin);
 
-        int16_t CreateBody(bool static_body);
+        bool CreateBody(int16_t& new_body_id);
 
         bool DestroyBody(int16_t body_id);
+
+        bool CreateGroup(int16_t body_id, int16_t& new_group_id);
+
+        bool DestoryGroup(int16_t body_id, int16_t group_id);
+
+        bool AddObject(int16_t group_id, Object::Type type, int16_t& new_object_id);
+
+        bool RemoveObject(int16_t group_id, int16_t object_id);
+
+        bool SetBodyState(int16_t body_id, bool state);
+
+        bool SetGroupState(int16_t group_id, bool state);
     };
 }
