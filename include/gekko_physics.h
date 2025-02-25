@@ -75,6 +75,8 @@ namespace Gekko::Physics {
     public:
         World();
 
+        ~World();
+
         void SetOrigin(const Math::Vec3& origin);
 
         bool CreateBody(int16_t& new_body_id);

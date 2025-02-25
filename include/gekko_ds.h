@@ -255,22 +255,22 @@ namespace Gekko::DS {
             }
         }
 
-        // Retrieves an active entity by its ID.
+        // Retrieves an entity by its ID.
         T& get(Q id) {
-            if (!is_valid(id) || !is_enabled(id)) {
-                throw std::out_of_range("Invalid or Disabled ID");
+            if (!is_valid(id)) {
+                throw std::out_of_range("Invalid ID");
             }
             return _dense[_sparse[id]];
         }
 
         const T& get(Q id) const {
-            if (!is_valid(id) || !is_enabled(id)) {
-                throw std::out_of_range("Invalid or Disabled ID");
+            if (!is_valid(id)) {
+                throw std::out_of_range("Invalid ID");
             }
             return _dense[_sparse[id]];
         }
 
-        // Clears all _entities.
+        // Clears all entities.
         void clear() {
             _dense.clear();
             _entities.clear();
@@ -281,13 +281,13 @@ namespace Gekko::DS {
         }
 
         // Returns the total number of entities (active(enabled) + active(disabled) + free).
-        Q size() const { return static_cast<Q>(_dense.size()); }
+        uint32_t size() const { return static_cast<Q>(_dense.size()); }
 
         // Returns the number of active (enabled) entities.
-        Q active_size() const { return _active_count; }
+        uint32_t active_size() const { return _active_count; }
 
         // Returns the number of active (disabled) entities.
-        Q disabled_size() const { return static_cast<Q>(_dense.size()) - _active_count; }
+        uint32_t disabled_size() const { return static_cast<Q>(_dense.size()) - _active_count; }
 
         // Iterators over active entities.
         T* begin() { return _dense.begin(); }

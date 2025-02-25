@@ -4,6 +4,12 @@ Gekko::Physics::World::World() : _origin(Math::Unit::HALF, Math::Unit::HALF, Mat
 {
 }
 
+Gekko::Physics::World::~World()
+{
+    // cleanup all the physics bodies
+    // TODO
+}
+
 void Gekko::Physics::World::SetOrigin(const Math::Vec3& origin)
 {
     _origin = origin;
@@ -168,12 +174,30 @@ bool Gekko::Physics::World::RemoveObject(int16_t group_id, int16_t object_id)
 
 bool Gekko::Physics::World::SetBodyState(int16_t body_id, bool state)
 {
-    // TODO
-    return false;
+    if (!_bodies.contains(body_id)) {
+        return false;
+    }
+
+    if (state) {
+        _bodies.enable(body_id);
+    } else {
+        _bodies.disable(body_id);
+    }
+
+    return true;
 }
 
 bool Gekko::Physics::World::SetGroupState(int16_t group_id, bool state)
 {
-    // TODO
-    return false;
+    if (!_groups.contains(group_id)) {
+        return false;
+    }
+
+    if (state) {
+        _groups.enable(group_id);
+    } else {
+        _groups.disable(group_id);
+    }
+
+    return true;
 }
