@@ -56,7 +56,7 @@ namespace Gekko::Physics {
 
     struct World {
     private:
-        Math::Vec3 _origin;
+        Math::Vec3 _origin, _up;
 
         // physics bodies 
         DS::SparseSet<int16_t, Body> _bodies;

@@ -73,6 +73,20 @@ namespace Gekko::DS {
             delete[] _data;
         }
 
+        static Vec<T> copy_vec(const Vec<T>& other) {
+            Vec<T> new_vec;
+
+            new_vec._size = other._size;
+            new_vec._capacity = other._capacity;
+            new_vec._data = new T[other._capacity];
+
+            if (new_vec._data) {
+                std::memcpy(new_vec._data, other._data, new_vec._size * sizeof(T));
+            }
+
+            return new_vec;
+        }
+
         void push_back(const T& value) {
             if (_size == _capacity) {
                 grow();
@@ -126,8 +140,10 @@ namespace Gekko::DS {
         }
 
         T* data() { return _data; }
+
         T* begin() { return _data; }
         T* end() { return _data + _size; }
+
         const T* begin() const { return _data; }
         const T* end() const { return _data + _size; }
     };

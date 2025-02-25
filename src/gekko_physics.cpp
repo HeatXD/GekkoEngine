@@ -1,13 +1,15 @@
 #include "gekko_physics.h"
 
-Gekko::Physics::World::World() : _origin(Math::Unit::HALF, Math::Unit::HALF, Math::Unit::HALF)
+Gekko::Physics::World::World() :
+    _origin(Math::Unit::HALF, Math::Unit::HALF, Math::Unit::HALF),
+    _up(Math::Unit(), Math::Unit::ONE, Math::Unit())
 {
 }
 
 Gekko::Physics::World::~World()
 {
     // cleanup all the physics bodies
-    // TODO
+
 }
 
 void Gekko::Physics::World::SetOrigin(const Math::Vec3& origin)
