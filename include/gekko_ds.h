@@ -296,7 +296,7 @@ namespace Gekko::DS {
             _active_count = 0;
         }
 
-        // Returns the total number of entities (active(enabled) + active(disabled) + free).
+        // Returns the total number of entities (active(enabled) + active(disabled)).
         uint32_t size() const { return static_cast<Q>(_dense.size()); }
 
         // Returns the number of active (enabled) entities.
@@ -308,7 +308,10 @@ namespace Gekko::DS {
         // Iterators over active entities.
         T* begin() { return _dense.begin(); }
         T* end() { return _dense.begin() + _active_count; }
+
         const T* begin() const { return _dense.begin(); }
         const T* end() const { return _dense.begin() + _active_count; }
+
+        const T* end_set() const { return _dense.begin() + size(); }
     };
 } // namespace Gekko::DS

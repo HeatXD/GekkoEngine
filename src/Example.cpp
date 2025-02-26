@@ -11,15 +11,14 @@ int main() {
     std::cout << "Character Count: " << en.NumRegisteredCharacters() << "\n";
 
     // Simulate updates
-    for (int i = 0; i < 400; i++)
+    for (int i = 1; i <= 400; i++)
     {
+        std::cout << "Frame: " << i << "\n";
         if (i == 5) {
             en.CreateCharacterInstance("ExampleCharacter", 0);
         }
-        std::cout << "Frame " << i << ":\n";
         en.Update();
         std::cout << "-----------------\n";
-        i++;
     }
 
     return 0;

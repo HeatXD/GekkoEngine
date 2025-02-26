@@ -43,8 +43,7 @@ void Character::Update()
     HandleStateTransition(movement_state_idx, movement_state_frame, base->movement_states.get());
     HandleStateTransition(combat_state_idx, combat_state_frame, base->combat_states.get());
 
-    // handle state interrupt logic
-    // todo
+    // state interrupt logic? maybe todo?
 
     // update frames
     movement_state_frame++;
@@ -69,9 +68,9 @@ void Character::HandleStateTransition(uint16_t& state_idx, uint32_t& state_frame
     }
 }
 
-void State::AddTransition(Transition* transition)
+void State::AddTransition(Transition transition)
 {
-    transitions.push_back(*transition);
+    transitions.push_back(transition);
     std::sort(transitions.begin(), transitions.end(), [](Transition a, Transition b) {
         return a.priority > b.priority;
     });

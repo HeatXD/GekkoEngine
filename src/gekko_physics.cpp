@@ -9,7 +9,17 @@ Gekko::Physics::World::World() :
 Gekko::Physics::World::~World()
 {
     // cleanup all the physics bodies
+    auto current = _bodies.begin();
 
+    while (current != _bodies.end_set()) {
+        DestroyBody(current->id);
+        current++;
+    }
+}
+
+void Gekko::Physics::World::SetOrientation(const Math::Vec3& up)
+{
+    _up = up;
 }
 
 void Gekko::Physics::World::SetOrigin(const Math::Vec3& origin)
@@ -25,6 +35,7 @@ bool Gekko::Physics::World::CreateBody(int16_t& new_body_id)
         return false;
     }
 
+    _bodies.end()->id = new_body_id;
     _bodies.end()->group_ids = new DS::Vec<int16_t>();
 
     return true;

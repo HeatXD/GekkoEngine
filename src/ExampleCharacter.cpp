@@ -64,16 +64,16 @@ void BuildBehaviour_ExampleCharacter() {
         };
 
     // Transitions
-    walkState.AddTransition(new Transition{
+    walkState.AddTransition({
         1, 1, [](Character* ctx) { return ctx->vars[0] <= 0; } // Walk → Run after timer expires
         });
-    runState.AddTransition(new Transition{
+    runState.AddTransition({
         1, 2, [](Character* ctx) { return ctx->vars[0] <= 0; } // Run → Jump after timer expires
         });
-    jumpState.AddTransition(new Transition{
+    jumpState.AddTransition({
         1, 3, [](Character* ctx) { return ctx->vars[0] <= 0; } // Jump → Fall after timer expires
         });
-    fallState.AddTransition(new Transition{
+    fallState.AddTransition({
         1, 0, [](Character* ctx) { return ctx->vars[0] <= 0; } // Fall → Walk after timer expires
         });
 

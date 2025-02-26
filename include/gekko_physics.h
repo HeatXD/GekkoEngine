@@ -36,6 +36,9 @@ namespace Gekko::Physics {
     };
 
     struct Body {
+        // used for cleanup later. dont touch.
+        int16_t id;
+
         bool is_static;
 
         Math::Vec3 position;
@@ -76,6 +79,8 @@ namespace Gekko::Physics {
         World();
 
         ~World();
+
+        void SetOrientation(const Math::Vec3& up);
 
         void SetOrigin(const Math::Vec3& origin);
 

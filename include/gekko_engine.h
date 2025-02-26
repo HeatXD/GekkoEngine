@@ -25,7 +25,7 @@ namespace Gekko::Engine {
         DS::Function<void(Character*, uint32_t)> OnUpdate;
         DS::Function<void(Character*)> OnExit;
 
-        void AddTransition(Transition* transition);
+        void AddTransition(Transition transition);
     };
 
     struct CharacterBehaviour {
@@ -55,6 +55,7 @@ namespace Gekko::Engine {
         Character();
 
         void Init(const CharacterBehaviour* bhvr);
+
         void Update();
 
     private:
