@@ -9,11 +9,12 @@ Gekko::Physics::World::World() :
 Gekko::Physics::World::~World()
 {
     // cleanup all the physics bodies
-    auto current = _bodies.begin();
-
-    while (current != _bodies.end_set()) {
-        DestroyBody(current->id);
-        current++;
+    if (_bodies.size() > 0) {
+        auto current = _bodies.end_set();
+        while (current != _bodies.begin()) {
+            current--;
+            DestroyBody(current->id);
+        }
     }
 }
 
