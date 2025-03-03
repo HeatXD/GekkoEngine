@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 #include <cassert>
@@ -71,6 +71,27 @@ namespace Gekko::Math {
         Unit& operator/=(const Unit& other) {
             *this = *this / other;
             return *this;
+        }
+
+        // Newton‑Raphson square root for fixed‑point unit
+        static Unit SqrtNewton(const Unit& u) {
+            if (u._raw < 0)
+                throw std::runtime_error("sqrt of negative number");
+            if (u._raw == 0)
+                return Unit(0);
+
+            // use u if it's at least 1, else default to 1 as the initial guess
+            Unit x = (u._raw >= Unit::ONE ? u : Unit(Unit::ONE));
+
+            // maximum iterations typically converges in fewer iterations given the precision
+            const int MAX_ITER = 10;
+            for (int i = 0; i < MAX_ITER; ++i) {
+                Unit next = (x + (u / x)) / Unit::From(2);
+                if (next == x)  // convergence check: no change in fixed‑point representation
+                    break;
+                x = next;
+            }
+            return x;
         }
 
         // VISUALIZATION ONLY

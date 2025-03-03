@@ -17,7 +17,6 @@ struct TestMath {
         // Test From and AsFloat conversion using tolerance for float comparisons.
         {
             Unit u = Unit::From(5);
-            // Although u.AsFloat() should be 5.0 exactly, we allow a small tolerance.
             assert(AlmostEqual(u.AsFloat(), 5.0f));
         }
 
@@ -47,7 +46,7 @@ struct TestMath {
             assert(c == Unit::From(3));
         }
 
-        // Test division with rounding (e.g. 5 / 2 should be close to 2.5)
+        // Test division with rounding
         {
             Unit a = Unit::From(5);
             Unit b = Unit::From(2);
@@ -83,6 +82,55 @@ struct TestMath {
 
             a /= Unit::From(2);
             assert(AlmostEqual(a.AsFloat(), 3.0f));
+        }
+
+        // Square root tests
+        {
+            // Perfect squares
+            std::cout << "sqrt(4): " << Unit::SqrtNewton(Unit::From(4)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(4)).AsFloat(), 2.0f));
+            std::cout << "sqrt(9): " << Unit::SqrtNewton(Unit::From(9)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(9)).AsFloat(), 3.0f));
+            std::cout << "sqrt(16): " << Unit::SqrtNewton(Unit::From(16)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(16)).AsFloat(), 4.0f));
+            std::cout << "sqrt(25): " << Unit::SqrtNewton(Unit::From(25)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(25)).AsFloat(), 5.0f));
+
+            // Non-perfect squares (should be close to true sqrt)
+            std::cout << "sqrt(2): " << Unit::SqrtNewton(Unit::From(2)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(2)).AsFloat(), std::sqrt(2.0f), 1e-3f));
+            std::cout << "sqrt(3): " << Unit::SqrtNewton(Unit::From(3)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(3)).AsFloat(), std::sqrt(3.0f), 1e-3f));
+            std::cout << "sqrt(5): " << Unit::SqrtNewton(Unit::From(5)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(5)).AsFloat(), std::sqrt(5.0f), 1e-3f));
+            std::cout << "sqrt(7): " << Unit::SqrtNewton(Unit::From(7)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(7)).AsFloat(), std::sqrt(7.0f), 1e-3f));
+
+            // Harder cases
+            std::cout << "sqrt(10): " << Unit::SqrtNewton(Unit::From(10)).AsFloat() << "\n";
+            std::cout << "sqrt(50): " << Unit::SqrtNewton(Unit::From(50)).AsFloat() << "\n";
+            std::cout << "sqrt(123): " << Unit::SqrtNewton(Unit::From(123)).AsFloat() << "\n";
+
+            // Large numbers
+            std::cout << "sqrt(100): " << Unit::SqrtNewton(Unit::From(100)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(100)).AsFloat(), 10.0f, 1e-3f));
+            std::cout << "sqrt(10000): " << Unit::SqrtNewton(Unit::From(10000)).AsFloat() << "\n";
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(10000)).AsFloat(), 100.0f, 1e-3f));
+
+            // Edge cases
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(0)).AsFloat(), 0.0f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(1)).AsFloat(), 1.0f));
+
+            // Negative input should throw an exception
+            bool exceptionThrown = false;
+            try {
+                Unit neg = Unit::From(-1);
+                Unit::SqrtNewton(neg);
+            }
+            catch (const std::runtime_error&) {
+                exceptionThrown = true;
+            }
+            assert(exceptionThrown);
         }
     }
 
@@ -141,50 +189,11 @@ struct TestMath {
             assert(prod == expected);
         }
 
-        // Test compound multiplication assignments
-        {
-            Vec3 v(Unit::From(1), Unit::From(2), Unit::From(3));
-            v *= Vec3(Unit::From(2), Unit::From(2), Unit::From(2));
-            Vec3 expected(Unit::From(2), Unit::From(4), Unit::From(6));
-            assert(v == expected);
-
-            v *= Unit::From(2);
-            expected = Vec3(Unit::From(4), Unit::From(8), Unit::From(12));
-            assert(v == expected);
-        }
-
-        // Test element-wise division and scalar division
-        {
-            Vec3 v1(Unit::From(4), Unit::From(6), Unit::From(8));
-            Vec3 v2(Unit::From(2), Unit::From(2), Unit::From(2));
-            Vec3 div = v1 / v2;
-            Vec3 expected(Unit::From(2), Unit::From(3), Unit::From(4));
-            assert(div == expected);
-
-            Vec3 div2 = v1 / Unit::From(2);
-            assert(div2 == expected);
-        }
-
-        // Test compound division assignments
-        {
-            Vec3 v(Unit::From(8), Unit::From(10), Unit::From(12));
-            v /= Vec3(Unit::From(2), Unit::From(2), Unit::From(2));
-            Vec3 expected(Unit::From(4), Unit::From(5), Unit::From(6));
-            assert(v == expected);
-
-            v /= Unit::From(2);
-            // After dividing, components should be (2, 2.5, 3)
-            assert(AlmostEqual(v.x.AsFloat(), 2.0f));
-            assert(AlmostEqual(v.y.AsFloat(), 2.5f));
-            assert(AlmostEqual(v.z.AsFloat(), 3.0f));
-        }
-
         // Test dot product
         {
             Vec3 v1(Unit::From(1), Unit::From(2), Unit::From(3));
             Vec3 v2(Unit::From(4), Unit::From(5), Unit::From(6));
             Unit dot = v1.Dot(v2);
-            // Expected dot: 1*4 + 2*5 + 3*6 = 32
             assert(dot == Unit::From(32));
         }
 

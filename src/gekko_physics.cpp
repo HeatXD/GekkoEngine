@@ -8,13 +8,18 @@ Gekko::Physics::World::World() :
 
 Gekko::Physics::World::~World()
 {
-    // cleanup all the physics bodies
-    if (_bodies.size() > 0) {
-        auto current = _bodies.end_set();
-        while (current != _bodies.begin()) {
-            current--;
-            DestroyBody(current->id);
-        }
+    auto cleanup_list = DS::Vec<int16_t>();
+
+    // acquire id's
+    auto current = _bodies.begin();
+    while (current != _bodies.end_set()) {
+        cleanup_list.push_back(current->id);
+        current++;
+    }
+
+    // cleanup bodies
+    for (uint32_t i = 0; i < cleanup_list.size(); i++) {
+        DestroyBody(cleanup_list[i]);
     }
 }
 
@@ -214,4 +219,71 @@ bool Gekko::Physics::World::SetGroupState(int16_t group_id, bool state)
     }
 
     return true;
+}
+
+void Gekko::Physics::World::Update()
+{
+    // find collision pairs
+    DetectPairs();
+
+    // resolve the collision pairs
+    ResolvePairs();
+
+    // apply body movement
+    IntegrateBodies();
+
+    // send out signals
+    ReactPairs();
+}
+
+void Gekko::Physics::World::DetectPairs()
+{
+    for (auto& body_a : _bodies) {
+        for (auto& body_b : _bodies) {
+            // same body collision? we skip that for now. maybe later
+            if (body_a.id == body_b.id) {
+                continue;
+            }
+        }
+    }
+}
+
+void Gekko::Physics::World::ResolvePairs()
+{
+}
+
+void Gekko::Physics::World::ReactPairs()
+{
+}
+
+void Gekko::Physics::World::IntegrateBodies()
+{
+}
+
+uint32_t Gekko::Physics::World::HashPair(int16_t a, int16_t b)
+{
+    // map int16_t (range: -32768 to 32767) to uint16_t (0 to 65535)
+    uint16_t u_a = static_cast<uint16_t>(a + 32768);
+    uint16_t u_b = static_cast<uint16_t>(b + 32768);
+
+    // keep the order consistent
+    if (u_a > u_b) {
+        std::swap(u_a, u_b);
+    }
+
+    // pack the two uint16_t values into a uint32_t
+    return (static_cast<uint32_t>(u_a) << 16) | u_b;
+}
+
+void Gekko::Physics::World::UnhashPair(uint32_t hash, int16_t& a, int16_t& b)
+{
+    a = (hash >> 16) - 32768;
+    b = (hash & 0xFFFF) - 32768;
+}
+
+bool Gekko::Physics::World::HashContainsId(uint32_t hash, int16_t id)
+{
+    int16_t a, b;
+    UnhashPair(hash, a, b);
+    return a == id || b == id;
 }

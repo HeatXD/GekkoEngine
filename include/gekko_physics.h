@@ -75,6 +75,15 @@ namespace Gekko::Physics {
         DS::SparseSet<int16_t, Capsule> _capsules;
         DS::SparseSet<int16_t, Diamond> _diamonds;
 
+        // detected pairs of the current iteration
+        struct DetectedGroups
+        {
+            uint32_t bdy_pair_hash;
+            uint32_t obj_group_pair_hash;
+        };
+
+        DS::Vec<uint32_t> _detected_pairs;
+
     public:
         World();
 
@@ -99,5 +108,22 @@ namespace Gekko::Physics {
         bool SetBodyState(int16_t body_id, bool state);
 
         bool SetGroupState(int16_t group_id, bool state);
+
+        void Update();
+
+    private:
+        void DetectPairs();
+
+        void ResolvePairs();
+
+        void ReactPairs();
+
+        void IntegrateBodies();
+
+        uint32_t HashPair(int16_t a, int16_t b);
+
+        void UnhashPair(uint32_t hash, int16_t &a, int16_t &b);
+
+        bool HashContainsId(uint32_t hash, int16_t id);
     };
 }

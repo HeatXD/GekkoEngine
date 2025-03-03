@@ -105,7 +105,9 @@ namespace Gekko::DS {
         }
 
         void remove_at(uint32_t index) {
-            if (index >= _size) return;
+            if (index >= _size) {
+                return;
+            }
             // swap with the last element
             if (index != _size - 1) {
                 std::swap(_data[index], _data[_size - 1]);
@@ -121,6 +123,15 @@ namespace Gekko::DS {
                     return;
                 }
             }
+        }
+
+        bool contains(const T& value) {
+            for (uint32_t i = 0; i < size(); i++) {
+                if (_data[i] == value) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         T& back() { return _data[_size - 1]; }
@@ -148,10 +159,10 @@ namespace Gekko::DS {
         const T* end() const { return _data + _size; }
     };
 
-    // SparseSet manages a collection of _entities and their associated data.
+    // SparseSet manages a collection of entities and their associated data.
     // It uses a signed integer type for IDs, with -1 representing an invalid ID.
-    // Active _entities are stored contiguously at the beginning of the _dense vector.
-    // Removed IDs are stored in _free_ids for reuse.
+    // Active entities are stored contiguously at the beginning of the dense vector.
+    // Removed IDs are stored in free_ids for reuse.
     template <typename Q, typename T>
     class SparseSet {
         static_assert(std::is_integral_v<Q>, "DS::SparseSet<Q, T> requires Q to be an integral type");
@@ -165,7 +176,7 @@ namespace Gekko::DS {
         Vec<Q> _free_ids;    // List of IDs available for reuse.
 
         Q _next_id = 0;      // Next new ID to assign.
-        Q _active_count = 0; // Number of active (enabled) _entities.
+        Q _active_count = 0; // Number of active (enabled) entities.
 
         // Swap the entries at two indices in the _dense vector (and update the mapping).
         void swap_dense(Q index1, Q index2) {
