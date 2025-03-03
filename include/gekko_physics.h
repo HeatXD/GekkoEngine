@@ -75,15 +75,6 @@ namespace Gekko::Physics {
         DS::SparseSet<int16_t, Capsule> _capsules;
         DS::SparseSet<int16_t, Diamond> _diamonds;
 
-        // detected pairs of the current iteration
-        struct DetectedGroups
-        {
-            uint32_t bdy_pair_hash;
-            uint32_t obj_group_pair_hash;
-        };
-
-        DS::Vec<uint32_t> _detected_pairs;
-
     public:
         World();
 

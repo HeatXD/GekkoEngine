@@ -244,6 +244,8 @@ void Gekko::Physics::World::DetectPairs()
             if (body_a.id == body_b.id) {
                 continue;
             }
+
+            auto body_pair = HashPair(body_a.id, body_b.id);
         }
     }
 }
