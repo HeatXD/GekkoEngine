@@ -1,16 +1,11 @@
 #pragma once
-
-//---------------------------------
-// Physics/Collision Engine Section
-//---------------------------------
-
 #include "gekko_math.h"
 #include "gekko_ds.h"
 
 namespace Gekko::Physics {
     // ==== Todo / Goals ====
-    // - Sphere, Capsule, Diamond Collision Detection
-    // - Sphere, Capsule, Diamond Collision Resolution
+    // - Sphere, Capsule Collision Detection
+    // - Sphere, Capsule Collision Resolution
     // - Collision Layers
     // - Collision Events
     // - Modifiable Physics World Origin
@@ -20,7 +15,7 @@ namespace Gekko::Physics {
         enum Type : uint16_t {
             Sphere,
             Capsule,
-            Diamond,
+            Count
         } type;
 
         int16_t shape_id;
@@ -73,7 +68,21 @@ namespace Gekko::Physics {
         // collision shapes
         DS::SparseSet<int16_t, Sphere> _spheres;
         DS::SparseSet<int16_t, Capsule> _capsules;
-        DS::SparseSet<int16_t, Diamond> _diamonds;
+
+        struct CInfo {
+            bool collided;
+
+            Math::Vec3 normal;
+            Math::Unit depth;
+        };
+
+        struct CPair {
+            uint32_t bodies_hash;
+            uint32_t groups_hash;
+
+            CInfo info;
+        };
+
 
     public:
         World();

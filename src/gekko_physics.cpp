@@ -137,9 +137,6 @@ bool Gekko::Physics::World::AddObject(int16_t group_id, Object::Type type, int16
     case Gekko::Physics::Object::Capsule:
         shape_id = _capsules.insert(Capsule());
         break;
-    case Gekko::Physics::Object::Diamond:
-        shape_id = _diamonds.insert(Diamond());
-        break;
     default:
         break;
     }
@@ -177,9 +174,6 @@ bool Gekko::Physics::World::RemoveObject(int16_t group_id, int16_t object_id)
         break;
     case Gekko::Physics::Object::Capsule:
         _capsules.remove(obj.shape_id);
-        break;
-    case Gekko::Physics::Object::Diamond:
-        _diamonds.remove(obj.shape_id);
         break;
     default:
         break;
@@ -246,6 +240,39 @@ void Gekko::Physics::World::DetectPairs()
             }
 
             auto body_pair = HashPair(body_a.id, body_b.id);
+
+            // check collision groups for collisions
+            // we allow for unique collision combinations
+            // check the mask if they should interact tho
+            const uint32_t a_group_len = body_a.group_ids->size();
+            const uint32_t b_group_len = body_b.group_ids->size();
+
+            for (uint32_t i = 0; i < a_group_len; i++) {
+                for (uint32_t j = 0; j < b_group_len; j++) {
+                    const int16_t g_a_id = body_a.group_ids->get(i);
+                    const int16_t g_b_id = body_b.group_ids->get(j);
+
+                    // skip if any of the groups are disabled.
+                    if (!_groups.is_enabled(g_a_id) || !_groups.is_enabled(g_b_id)) {
+                        continue;
+                    }
+
+                    const auto& group_a = _groups.get(g_a_id);
+                    const auto& group_b = _groups.get(g_b_id);
+
+                    const bool matching =
+                        group_a.group_layers & group_b.detect_layers ||
+                        group_b.group_layers & group_a.detect_layers;
+
+                    // skip if these groups dont interact
+                    if (!matching) {
+                        continue;
+                    }
+
+                    // we know these groups might interact.
+                    // todo
+                }
+            }
         }
     }
 }

@@ -140,6 +140,9 @@ namespace Gekko::DS {
         T& operator[](uint32_t i) { return _data[i]; }
         const T& operator[](uint32_t i) const { return _data[i]; }
 
+        T& get(uint32_t index) { return _data[index]; }
+        const T& get(uint32_t index) const { return _data[index]; }
+
         uint32_t size() const { return _size; }
         uint32_t capacity() const { return _capacity; }
 

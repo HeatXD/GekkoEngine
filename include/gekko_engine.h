@@ -6,6 +6,7 @@
 #include <unordered_map>
 
 #include "gekko_ds.h"
+#include "gekko_physics.h"
 
 namespace Gekko::Engine {
 
@@ -63,6 +64,7 @@ namespace Gekko::Engine {
     };
 
     struct Engine {
+        Physics::World phys_world;
         std::vector<Character> characters;
 
         static std::unordered_map<std::string, const CharacterBehaviour*>& GetCharacterRegister();

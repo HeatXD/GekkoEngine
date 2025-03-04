@@ -98,13 +98,13 @@ struct TestMath {
 
             // Non-perfect squares (should be close to true sqrt)
             std::cout << "sqrt(2): " << Unit::SqrtNewton(Unit::From(2)).AsFloat() << "\n";
-            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(2)).AsFloat(), std::sqrt(2.0f), 1e-3f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(2)).AsFloat(), std::sqrt(2.0f)));
             std::cout << "sqrt(3): " << Unit::SqrtNewton(Unit::From(3)).AsFloat() << "\n";
-            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(3)).AsFloat(), std::sqrt(3.0f), 1e-3f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(3)).AsFloat(), std::sqrt(3.0f)));
             std::cout << "sqrt(5): " << Unit::SqrtNewton(Unit::From(5)).AsFloat() << "\n";
-            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(5)).AsFloat(), std::sqrt(5.0f), 1e-3f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(5)).AsFloat(), std::sqrt(5.0f)));
             std::cout << "sqrt(7): " << Unit::SqrtNewton(Unit::From(7)).AsFloat() << "\n";
-            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(7)).AsFloat(), std::sqrt(7.0f), 1e-3f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(7)).AsFloat(), std::sqrt(7.0f)));
 
             // Harder cases
             std::cout << "sqrt(10): " << Unit::SqrtNewton(Unit::From(10)).AsFloat() << "\n";
@@ -113,9 +113,9 @@ struct TestMath {
 
             // Large numbers
             std::cout << "sqrt(100): " << Unit::SqrtNewton(Unit::From(100)).AsFloat() << "\n";
-            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(100)).AsFloat(), 10.0f, 1e-3f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(100)).AsFloat(), 10.0f));
             std::cout << "sqrt(10000): " << Unit::SqrtNewton(Unit::From(10000)).AsFloat() << "\n";
-            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(10000)).AsFloat(), 100.0f, 1e-3f));
+            assert(AlmostEqual(Unit::SqrtNewton(Unit::From(10000)).AsFloat(), 100.0f));
 
             // Edge cases
             assert(AlmostEqual(Unit::SqrtNewton(Unit::From(0)).AsFloat(), 0.0f));
