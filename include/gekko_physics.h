@@ -50,8 +50,6 @@ namespace Gekko::Physics {
 
     struct Capsule {};
 
-    struct Diamond {};
-
     struct World {
     private:
         Math::Vec3 _origin, _up;
