@@ -70,6 +70,7 @@ namespace Gekko::Physics {
         struct CInfo {
             bool collided;
 
+            Math::Vec3 contact;
             Math::Vec3 normal;
             Math::Unit depth;
         };
@@ -128,7 +129,9 @@ namespace Gekko::Physics {
         void DoGroupsCollide(CPair& info, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b);
 
         void CheckSphereSphere(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
+
         void CheckSphereCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
+
         void CheckCapsuleCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
     };
 }

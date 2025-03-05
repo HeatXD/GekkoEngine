@@ -290,7 +290,8 @@ void Gekko::Physics::World::DetectPairs()
 
                     // now we know the pair hasnt been found before
                     // lets see if they interact with eachother
-                    CPair pair;
+                    CPair pair{};
+                    pair.info.collided = false;
                     DoGroupsCollide(pair, body_a, body_b, group_a, group_b);
 
                     // if the group didnt collide move on
@@ -401,6 +402,8 @@ void Gekko::Physics::World::CheckSphereSphere(
     const Object* obj_a, const Object* obj_b,
     const Body* body_a, const Body* body_b)
 {
+    auto& sphere_a = _spheres.get(obj_a->shape_id);
+    auto& sphere_b = _spheres.get(obj_b->shape_id);
 }
 
 void Gekko::Physics::World::CheckSphereCapsule(
@@ -408,6 +411,8 @@ void Gekko::Physics::World::CheckSphereCapsule(
     const Object* obj_a, const Object* obj_b,
     const Body* body_a, const Body* body_b)
 {
+    auto& sphere = _spheres.get(obj_a->shape_id);
+    auto& capsule = _capsules.get(obj_b->shape_id);
 }
 
 void Gekko::Physics::World::CheckCapsuleCapsule(
@@ -415,4 +420,6 @@ void Gekko::Physics::World::CheckCapsuleCapsule(
     const Object* obj_a, const Object* obj_b,
     const Body* body_a, const Body* body_b)
 {
+    auto& cap_a = _capsules.get(obj_a->shape_id);
+    auto& cap_b = _capsules.get(obj_b->shape_id);
 }
