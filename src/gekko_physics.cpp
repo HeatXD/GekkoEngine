@@ -232,6 +232,9 @@ void Gekko::Physics::World::Update()
 
 void Gekko::Physics::World::DetectPairs()
 {
+    // cleanup pairs
+    _pairs.clear();
+
     for (auto& body_a : _bodies) {
         for (auto& body_b : _bodies) {
             // same body collision? we skip that for now. maybe later
@@ -239,7 +242,7 @@ void Gekko::Physics::World::DetectPairs()
                 continue;
             }
 
-            auto body_pair = HashPair(body_a.id, body_b.id);
+            const uint32_t body_pair = HashPair(body_a.id, body_b.id);
 
             // check collision groups for collisions
             // we allow for unique collision combinations
@@ -269,8 +272,37 @@ void Gekko::Physics::World::DetectPairs()
                         continue;
                     }
 
+                    const uint32_t group_pair = HashPair(g_a_id, g_b_id);
+
                     // we know these groups might interact.
-                    // todo
+                    // so first check if these groups are already interacting
+                    bool skip_pair = false;
+                    for (uint32_t i = 0; i < _pairs.size(); i++) {
+                        if (_pairs[i].groups_hash == group_pair) {
+                            skip_pair = true;
+                            break;
+                        }
+                    }
+
+                    if (skip_pair) {
+                        continue;
+                    }
+
+                    // now we know the pair hasnt been found before
+                    // lets see if they interact with eachother
+                    CPair pair;
+                    DoGroupsCollide(pair, body_a, body_b, group_a, group_b);
+
+                    // if the group didnt collide move on
+                    if (!pair.info.collided) {
+                        continue;
+                    }
+
+                    pair.bodies_hash = body_pair;
+                    pair.groups_hash = group_pair;
+
+                    // add collision pair and move on to the next steps
+                    _pairs.push_back(pair);
                 }
             }
         }
@@ -315,4 +347,9 @@ bool Gekko::Physics::World::HashContainsId(uint32_t hash, int16_t id)
     int16_t a, b;
     UnhashPair(hash, a, b);
     return a == id || b == id;
+}
+
+void Gekko::Physics::World::DoGroupsCollide(CPair& info, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b)
+{
+
 }

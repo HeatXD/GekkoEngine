@@ -43,6 +43,7 @@ namespace Gekko::Physics {
         DS::Vec<int16_t>* group_ids;
     };
 
+    // collision shapes
     struct Sphere {
         Math::Vec3 local_center;
         Math::Unit radius;
@@ -81,6 +82,7 @@ namespace Gekko::Physics {
             CInfo info;
         };
 
+        DS::Vec<CPair> _pairs;
 
     public:
         World();
@@ -123,5 +125,9 @@ namespace Gekko::Physics {
         void UnhashPair(uint32_t hash, int16_t &a, int16_t &b);
 
         bool HashContainsId(uint32_t hash, int16_t id);
+
+        void DoGroupsCollide(CPair& info, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b);
+
+        void SphereSphere(CInfo& info, int16_t body_a, int16_t body_b, int16_t obj_a, int16_t obj_b);
     };
 }
