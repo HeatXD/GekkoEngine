@@ -312,14 +312,17 @@ void Gekko::Physics::World::DetectPairs()
 
 void Gekko::Physics::World::ResolvePairs()
 {
+    // todo
 }
 
 void Gekko::Physics::World::ReactPairs()
 {
+    // todo
 }
 
 void Gekko::Physics::World::IntegrateBodies()
 {
+    // todo
 }
 
 uint32_t Gekko::Physics::World::HashPair(int16_t a, int16_t b)
