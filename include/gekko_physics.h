@@ -13,9 +13,8 @@ namespace Gekko::Physics {
 
     struct Object {
         enum Type : uint16_t {
-            Sphere,
-            Capsule,
-            Count
+            Sphere = 1 << 0,
+            Capsule = 1 << 1,
         } type;
 
         int16_t shape_id;
@@ -128,6 +127,8 @@ namespace Gekko::Physics {
 
         void DoGroupsCollide(CPair& info, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b);
 
-        void SphereSphere(CInfo& info, int16_t body_a, int16_t body_b, int16_t obj_a, int16_t obj_b);
+        void CheckSphereSphere(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
+        void CheckSphereCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
+        void CheckCapsuleCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
     };
 }

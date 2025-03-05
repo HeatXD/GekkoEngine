@@ -349,7 +349,70 @@ bool Gekko::Physics::World::HashContainsId(uint32_t hash, int16_t id)
     return a == id || b == id;
 }
 
-void Gekko::Physics::World::DoGroupsCollide(CPair& info, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b)
+void Gekko::Physics::World::DoGroupsCollide(
+    CPair& info,
+    const Body& body_a, const Body& body_b,
+    const ObjectGroup& group_a, const ObjectGroup& group_b)
 {
+    const uint32_t a_obj_len = group_a.object_ids->size();
+    const uint32_t b_obj_len = group_b.object_ids->size();
 
+    for (uint32_t i = 0; i < a_obj_len; i++) {
+        for (uint32_t j = 0; j < b_obj_len; j++) {
+            // figure out the collison function and sort by the type
+            const Object* a_obj = &_objects.get(group_a.object_ids->get(i));
+            const Object* b_obj = &_objects.get(group_b.object_ids->get(j));
+
+            const Body* b_a = &body_a;
+            const Body* b_b = &body_b;
+
+            // keep common order
+            if (a_obj->type > b_obj->type) {
+                std::swap(a_obj, b_obj);
+                std::swap(b_a, b_b);
+            }
+
+            const uint16_t combined_type = a_obj->type | b_obj->type;
+
+            switch (combined_type) {
+            case Object::Sphere | Object::Sphere:
+                CheckSphereSphere(info.info, a_obj, b_obj, b_a, b_b);
+                break;
+            case Object::Sphere | Object::Capsule:
+                CheckSphereCapsule(info.info, a_obj, b_obj, b_a, b_b);
+                break;
+            case Object::Capsule | Object::Capsule:
+                CheckCapsuleCapsule(info.info, a_obj, b_obj, b_a, b_b);
+                break;
+            default:
+                break;
+            };
+
+            // collision found? stop checking the groups against eachother and early return.
+            if (info.info.collided) {
+                return;
+            }
+        }
+    }
+}
+
+void Gekko::Physics::World::CheckSphereSphere(
+    CInfo& info,
+    const Object* obj_a, const Object* obj_b,
+    const Body* body_a, const Body* body_b)
+{
+}
+
+void Gekko::Physics::World::CheckSphereCapsule(
+    CInfo& info,
+    const Object* obj_a, const Object* obj_b,
+    const Body* body_a, const Body* body_b)
+{
+}
+
+void Gekko::Physics::World::CheckCapsuleCapsule(
+    CInfo& info,
+    const Object* obj_a, const Object* obj_b,
+    const Body* body_a, const Body* body_b)
+{
 }
