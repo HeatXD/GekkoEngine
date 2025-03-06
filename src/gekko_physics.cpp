@@ -434,7 +434,7 @@ void Gekko::Physics::World::CheckSphereSphere(
         diff / distance :
         Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
 
-    // handle zeor case
+    // handle zero case
     if (info.normal == Math::Vec3::ZERO) {
         info.normal = Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
     }
