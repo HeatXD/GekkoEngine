@@ -70,9 +70,8 @@ namespace Gekko::Physics {
         struct CInfo {
             bool collided;
 
-            Math::Vec3 contact;
-            Math::Vec3 normal;
             Math::Unit depth;
+            Math::Vec3 normal;
         };
 
         struct CPair {

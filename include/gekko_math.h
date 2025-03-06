@@ -23,6 +23,38 @@ namespace Gekko::Math {
             return Unit(val * ONE);
         }
 
+        bool operator>(const Unit& other) const {
+            return _raw > other._raw;
+        }
+
+        bool operator>=(const Unit& other) const {
+            return _raw >= other._raw;
+        }
+
+        bool operator<(const Unit& other) const {
+            return _raw < other._raw;
+        }
+
+        bool operator<=(const Unit& other) const {
+            return _raw <= other._raw;
+        }
+
+        bool operator>(const int32_t& other) const {
+            return _raw > other;
+        }
+
+        bool operator>=(const int32_t& other) const {
+            return _raw >= other;
+        }
+
+        bool operator<(const int32_t& other) const {
+            return _raw < other;
+        }
+
+        bool operator<=(const int32_t& other) const {
+            return _raw <= other;
+        }
+
         Unit operator+(const Unit& other) const {
             return Unit(_raw + other._raw);
         }

@@ -407,6 +407,40 @@ void Gekko::Physics::World::CheckSphereSphere(
 {
     auto& sphere_a = _spheres.get(obj_a->shape_id);
     auto& sphere_b = _spheres.get(obj_b->shape_id);
+
+    // TODO when i get to body rotation handle it properly by applying the transforms.
+    Math::Vec3 wpos_a = _origin + body_a->position;
+    Math::Vec3 wpos_b = _origin + body_b->position;
+
+    Math::Vec3 diff = (wpos_a + sphere_a.local_center) - (wpos_b + sphere_b.local_center);
+
+    Math::Unit distSq = diff.Dot(diff);
+    Math::Unit radSum = sphere_a.radius + sphere_b.radius;
+    Math::Unit radSumSq = radSum * radSum;
+
+    info.collided = distSq >= radSumSq;
+
+    // quit early if theres no collision
+    if (!info.collided) {
+        return;
+    }
+
+    // compute real distance
+    Math::Unit distance = Math::Unit::SqrtNewton(distSq);
+
+    // compute normal
+    info.normal =
+        distance > 0 ?
+        diff / distance :
+        Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
+
+    // handle zeor case
+    if (info.normal == Math::Vec3::ZERO) {
+        info.normal = Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
+    }
+
+    // compute pen depth
+    info.depth = radSum - distance;
 }
 
 void Gekko::Physics::World::CheckSphereCapsule(
