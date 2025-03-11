@@ -116,7 +116,7 @@ namespace Gekko::Math {
             }
 
             // use u if it's at least 1, else default to 1 as the initial guess
-            Unit x = (u._raw >= Unit::ONE ? u : Unit(Unit::ONE));
+            Unit x = (u._raw >= Unit::ONE ? u : Unit::ONE);
 
             // maximum iterations typically converges in fewer iterations given the precision
             const int MAX_ITER = 10;
@@ -143,8 +143,6 @@ namespace Gekko::Math {
     };
 
     struct Vec3 {
-        static const Vec3 ZERO;
-
         Unit x, y, z;
 
         Vec3() = default;

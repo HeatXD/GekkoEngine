@@ -44,11 +44,14 @@ namespace Gekko::Physics {
 
     // collision shapes
     struct Sphere {
-        Math::Vec3 local_center;
+        Math::Vec3 position;
         Math::Unit radius;
     };
 
-    struct Capsule {};
+    struct Capsule {
+        Math::Vec3 start, end;
+        Math::Unit radius;
+    };
 
     struct World {
     private:
@@ -132,5 +135,7 @@ namespace Gekko::Physics {
         void CheckSphereCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
 
         void CheckCapsuleCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
+
+        void CalcDepthNorm(CInfo& info, const Math::Unit& distSq, const Math::Unit& radSum, const Math::Vec3& diff);
     };
 }
