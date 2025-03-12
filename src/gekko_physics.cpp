@@ -412,7 +412,7 @@ void Gekko::Physics::World::CheckSphereSphere(
     Math::Vec3 wpos_a = _origin + body_a->position;
     Math::Vec3 wpos_b = _origin + body_b->position;
 
-    Math::Vec3 diff = (wpos_a + sphere_a.local_center) - (wpos_b + sphere_b.local_center);
+    Math::Vec3 diff = (wpos_a + sphere_a.position) - (wpos_b + sphere_b.position);
 
     Math::Unit distSq = diff.Dot(diff);
     Math::Unit radSum = sphere_a.radius + sphere_b.radius;
@@ -425,22 +425,7 @@ void Gekko::Physics::World::CheckSphereSphere(
         return;
     }
 
-    // compute real distance
-    Math::Unit distance = Math::Unit::SqrtNewton(distSq);
-
-    // compute normal
-    info.normal =
-        distance > 0 ?
-        diff / distance :
-        Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
-
-    // handle zero case
-    if (info.normal == Math::Vec3::ZERO) {
-        info.normal = Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
-    }
-
-    // compute pen depth
-    info.depth = radSum - distance;
+    CalcDepthNorm(info, distSq, radSum, diff);
 }
 
 void Gekko::Physics::World::CheckSphereCapsule(
@@ -459,4 +444,28 @@ void Gekko::Physics::World::CheckCapsuleCapsule(
 {
     auto& cap_a = _capsules.get(obj_a->shape_id);
     auto& cap_b = _capsules.get(obj_b->shape_id);
+}
+
+void Gekko::Physics::World::CalcDepthNorm(
+    CInfo& info,
+    const Math::Unit& distSq,
+    const Math::Unit& radSum,
+    const Math::Vec3& diff)
+{
+    static const auto def_norm = Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
+    static const auto zero = Math::Vec3(Math::Unit(), Math::Unit(), Math::Unit());
+
+    // compute real distance
+    const Math::Unit distance = Math::Unit::SqrtNewton(distSq);
+
+    // compute normal
+    info.normal = distance > 0 ? diff / distance : def_norm;
+
+    // handle zero case
+    if (info.normal == zero) {
+        info.normal = def_norm;
+    }
+
+    // compute pen depth
+    info.depth = radSum - distance;
 }
