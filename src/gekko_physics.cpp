@@ -250,6 +250,8 @@ void Gekko::Physics::World::DetectPairs()
             const uint32_t a_group_len = body_a.group_ids->size();
             const uint32_t b_group_len = body_b.group_ids->size();
 
+            // technically currently the first inserted groups in the list get priority over the others.
+            // maybe add priotirty based sorting later down the line? TODO
             for (uint32_t i = 0; i < a_group_len; i++) {
                 for (uint32_t j = 0; j < b_group_len; j++) {
                     const int16_t g_a_id = body_a.group_ids->get(i);
@@ -358,6 +360,8 @@ void Gekko::Physics::World::DoGroupsCollide(
     const Body& body_a, const Body& body_b,
     const ObjectGroup& group_a, const ObjectGroup& group_b)
 {
+    // technically currently the first inserted objects in the list get priority over the others.
+    // maybe add priotirty based sorting later down the line? TODO
     const uint32_t a_obj_len = group_a.object_ids->size();
     const uint32_t b_obj_len = group_b.object_ids->size();
 
@@ -424,8 +428,8 @@ void Gekko::Physics::World::CheckSphereSphere(
     if (!info.collided) {
         return;
     }
-
-    CalcDepthNorm(info, distSq, radSum, diff);
+     
+    CalculateDepthNorm(info, distSq, radSum, diff);
 }
 
 void Gekko::Physics::World::CheckSphereCapsule(
@@ -446,7 +450,7 @@ void Gekko::Physics::World::CheckCapsuleCapsule(
     auto& cap_b = _capsules.get(obj_b->shape_id);
 }
 
-void Gekko::Physics::World::CalcDepthNorm(
+void Gekko::Physics::World::CalculateDepthNorm(
     CInfo& info,
     const Math::Unit& distSq,
     const Math::Unit& radSum,

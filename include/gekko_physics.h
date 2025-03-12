@@ -72,9 +72,12 @@ namespace Gekko::Physics {
 
         struct CInfo {
             bool collided;
-
+            // collision depth
             Math::Unit depth;
+            // collision normal
             Math::Vec3 normal;
+            // contact points
+            Math::Vec3 con_a, con_b, con_sym;
         };
 
         struct CPair {
@@ -136,6 +139,6 @@ namespace Gekko::Physics {
 
         void CheckCapsuleCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
 
-        void CalcDepthNorm(CInfo& info, const Math::Unit& distSq, const Math::Unit& radSum, const Math::Vec3& diff);
+        void CalculateDepthNorm(CInfo& info, const Math::Unit& distSq, const Math::Unit& radSum, const Math::Vec3& diff);
     };
 }
