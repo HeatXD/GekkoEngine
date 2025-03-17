@@ -217,13 +217,16 @@ bool Gekko::Physics::World::SetGroupState(int16_t group_id, bool state)
 
 void Gekko::Physics::World::Update()
 {
+    // apply part of body movement
+    IntegrateBodies();
+
     // find collision pairs
     DetectPairs();
 
     // resolve the collision pairs
     ResolvePairs();
 
-    // apply body movement
+    // apply remaining body movement
     IntegrateBodies();
 
     // send out signals
@@ -324,7 +327,16 @@ void Gekko::Physics::World::ReactPairs()
 
 void Gekko::Physics::World::IntegrateBodies()
 {
-    // todo
+    // we do split integration for increase stability
+    // so this function will be called at the start and end of an iteration
+    for (auto& body: _bodies) {
+        if (body.is_static) {
+            continue;
+        }
+
+        body.velocity += body.acceleration * Math::Unit::HALF;
+        body.position += body.velocity * Math::Unit::HALF;
+    }
 }
 
 uint32_t Gekko::Physics::World::HashPair(int16_t a, int16_t b)
