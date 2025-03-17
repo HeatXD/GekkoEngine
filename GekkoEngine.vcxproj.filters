@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Example.cpp">
+    <ClCompile Include="test\Example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ExampleCharacter.cpp">
+    <ClCompile Include="test\ExampleCharacter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gekko_engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestMath.cpp">
+    <ClCompile Include="test\TestMath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\gekko_physics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestDS.cpp">
+    <ClCompile Include="test\TestDS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
