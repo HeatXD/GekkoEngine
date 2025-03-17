@@ -217,7 +217,7 @@ bool Gekko::Physics::World::SetGroupState(int16_t group_id, bool state)
 
 void Gekko::Physics::World::Update()
 {
-    // apply part of body movement
+    // apply first half of body movement
     IntegrateBodies();
 
     // find collision pairs
