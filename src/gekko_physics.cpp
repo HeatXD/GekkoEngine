@@ -416,7 +416,10 @@ void Gekko::Physics::World::CheckSphereSphere(
     Math::Vec3 wpos_a = _origin + body_a->position;
     Math::Vec3 wpos_b = _origin + body_b->position;
 
-    Math::Vec3 diff = (wpos_a + sphere_a.position) - (wpos_b + sphere_b.position);
+    Math::Vec3 sphere_pos_a = wpos_a + sphere_a.position;
+    Math::Vec3 sphere_pos_b = wpos_b + sphere_b.position;
+
+    Math::Vec3 diff = sphere_pos_a - sphere_pos_b;
 
     Math::Unit distSq = diff.Dot(diff);
     Math::Unit radSum = sphere_a.radius + sphere_b.radius;
@@ -430,6 +433,13 @@ void Gekko::Physics::World::CheckSphereSphere(
     }
      
     CalculateDepthNorm(info, distSq, radSum, diff);
+
+    // sym contact point
+    info.con_sym = sphere_pos_a + info.normal * (sphere_a.radius + (info.depth / Math::Unit::From(2)));
+
+    // asym contact points
+    info.con_a = sphere_pos_a + info.normal * sphere_a.radius;
+    info.con_b = sphere_pos_b - info.normal * sphere_b.radius;
 }
 
 void Gekko::Physics::World::CheckSphereCapsule(
