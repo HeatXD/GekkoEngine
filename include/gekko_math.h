@@ -16,11 +16,13 @@ namespace Gekko::Math {
         static const int32_t HALF = 0x4000;
 
         Unit() = default;
-        Unit(int32_t val) : _raw(val) {}
+        Unit(int32_t val) : _raw(val * ONE) {}
         Unit(const Unit& val) = default;
 
         static Unit From(int32_t val) {
-            return Unit(val * ONE);
+            Unit value {};
+            value._raw = val;
+            return value;
         }
 
         bool operator>(const Unit& other) const {
@@ -56,7 +58,7 @@ namespace Gekko::Math {
         }
 
         Unit operator+(const Unit& other) const {
-            return Unit(_raw + other._raw);
+            return Unit::From(_raw + other._raw);
         }
 
         Unit& operator+=(const Unit& other) {
@@ -65,7 +67,7 @@ namespace Gekko::Math {
         }
 
         Unit operator-(const Unit& other) const {
-            return Unit(_raw - other._raw);
+            return Unit::From(_raw - other._raw);
         }
 
         Unit& operator-=(const Unit& other) {
@@ -79,12 +81,12 @@ namespace Gekko::Math {
             }
             int64_t num = static_cast<int64_t>(_raw) * ONE;
             int64_t adjust = std::abs(other._raw) / 2;
-            return Unit(static_cast<int32_t>((num + (other._raw > 0 ? adjust : -adjust)) / other._raw));
+            return Unit::From(static_cast<int32_t>((num + (other._raw > 0 ? adjust : -adjust)) / other._raw));
         }
 
         Unit operator*(const Unit& other) const {
             int64_t result = static_cast<int64_t>(_raw) * other._raw;
-            return Unit(static_cast<int32_t>((result + (ONE / 2)) / ONE));
+            return Unit::From(static_cast<int32_t>((result + (ONE / 2)) / ONE));
         }
 
         bool operator==(const Unit& other) const {
@@ -112,7 +114,7 @@ namespace Gekko::Math {
             }
 
             if (u._raw == 0) {
-                return Unit(0);
+                return 0;
             }
 
             // use u if it's at least 1, else default to 1 as the initial guess
@@ -121,7 +123,7 @@ namespace Gekko::Math {
             // maximum iterations typically converges in fewer iterations given the precision
             const int MAX_ITER = 10;
             for (int i = 0; i < MAX_ITER; ++i) {
-                Unit next = (x + (u / x)) / Unit::From(2);
+                Unit next = (x + (u / x)) / 2;
                 if (next == x) {  // convergence check: no change in fixed‑point representation
                     break;
                 }

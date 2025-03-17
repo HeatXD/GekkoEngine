@@ -435,7 +435,7 @@ void Gekko::Physics::World::CheckSphereSphere(
     CalculateDepthNorm(info, distSq, radSum, diff);
 
     // sym contact point
-    info.con_sym = sphere_pos_a + info.normal * (sphere_a.radius + (info.depth / Math::Unit::From(2)));
+    info.con_sym = sphere_pos_a + info.normal * (sphere_a.radius + (info.depth / 2));
 
     // asym contact points
     info.con_a = sphere_pos_a + info.normal * sphere_a.radius;
