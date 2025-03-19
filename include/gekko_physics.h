@@ -71,7 +71,7 @@ namespace Gekko::Physics {
         DS::SparseSet<int16_t, Capsule> _capsules;
 
         struct CInfo {
-            bool collided;
+            bool collided, swapped;
             // collision depth
             Math::Unit depth;
             // collision normal
@@ -131,7 +131,7 @@ namespace Gekko::Physics {
 
         bool HashContainsId(uint32_t hash, int16_t id);
 
-        void DoGroupsCollide(CPair& info, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b);
+        void DoGroupsCollide(CPair& pair, const Body& body_a, const Body& body_b, const ObjectGroup& group_a, const ObjectGroup& group_b);
 
         void CheckSphereSphere(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
 

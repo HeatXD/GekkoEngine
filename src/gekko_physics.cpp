@@ -296,6 +296,7 @@ void Gekko::Physics::World::DetectPairs()
                     // now we know the pair hasnt been found before
                     // lets see if they interact with eachother
                     CPair pair{};
+                    pair.info.swapped = false;
                     pair.info.collided = false;
                     DoGroupsCollide(pair, body_a, body_b, group_a, group_b);
 
@@ -317,7 +318,60 @@ void Gekko::Physics::World::DetectPairs()
 
 void Gekko::Physics::World::ResolvePairs()
 {
-    // todo
+    // utilize the pen depth and collision normal to
+    // resolve the collisons of these bodies
+    // for now all collisions are in-elastic
+    // maybe later I'll add a bounce factor
+
+    for (auto& pair : _pairs) {
+        // collect body and group ids
+        int16_t b_a_id, b_b_id, g_a_id, g_b_id;
+        UnhashPair(pair.bodies_hash, b_a_id, b_b_id);
+        UnhashPair(pair.groups_hash, g_a_id, g_b_id);
+
+        // check if the groups want the collision to be resolved
+        // and check if the bodies arent static
+        // if not early quit
+        Body* body_a = &_bodies.get(b_a_id);
+        Body* body_b = &_bodies.get(b_b_id);
+
+        const auto& group_a = _groups.get(g_a_id);
+        const auto& group_b = _groups.get(g_b_id);
+
+        bool a_resolve = (group_b.group_layers & group_a.resolve_layers) && !body_a->is_static;
+        bool b_resolve = (group_a.group_layers & group_b.resolve_layers) && !body_b->is_static;
+
+        if (a_resolve || b_resolve) {
+            continue;
+        }
+
+        // try solve the collision
+        static const Math::Unit resolve_margin = Math::Unit::From(4);
+
+        const Math::Vec3 correction = pair.info.normal * (pair.info.depth + resolve_margin);
+        const Math::Vec3 half_correction = correction * Math::Unit::HALF;
+
+        if (pair.info.swapped) {
+            std::swap(body_a, body_b);
+            std::swap(a_resolve, b_resolve);
+        }
+
+        // even collision resolution.
+        if (a_resolve && b_resolve) {
+            body_a->position -= half_correction;
+            body_b->position += half_correction;
+        }
+        else if (a_resolve) {
+            // only move a
+            body_a->position -= correction;
+        }
+        else if (b_resolve) {
+            // only move b
+            body_b->position += correction;
+        }
+
+        // todo handle velocities
+    }
 }
 
 void Gekko::Physics::World::ReactPairs()
@@ -329,7 +383,7 @@ void Gekko::Physics::World::IntegrateBodies()
 {
     // we do split integration for increase stability
     // so this function will be called at the start and end of an iteration
-    for (auto& body: _bodies) {
+    for (auto& body : _bodies) {
         if (body.is_static) {
             continue;
         }
@@ -368,7 +422,7 @@ bool Gekko::Physics::World::HashContainsId(uint32_t hash, int16_t id)
 }
 
 void Gekko::Physics::World::DoGroupsCollide(
-    CPair& info,
+    CPair& pair,
     const Body& body_a, const Body& body_b,
     const ObjectGroup& group_a, const ObjectGroup& group_b)
 {
@@ -387,7 +441,8 @@ void Gekko::Physics::World::DoGroupsCollide(
             const Body* b_b = &body_b;
 
             // keep common order
-            if (a_obj->type > b_obj->type) {
+            pair.info.swapped = a_obj->type > b_obj->type;
+            if (pair.info.swapped) {
                 std::swap(a_obj, b_obj);
                 std::swap(b_a, b_b);
             }
@@ -396,20 +451,20 @@ void Gekko::Physics::World::DoGroupsCollide(
 
             switch (combined_type) {
             case Object::Sphere | Object::Sphere:
-                CheckSphereSphere(info.info, a_obj, b_obj, b_a, b_b);
+                CheckSphereSphere(pair.info, a_obj, b_obj, b_a, b_b);
                 break;
             case Object::Sphere | Object::Capsule:
-                CheckSphereCapsule(info.info, a_obj, b_obj, b_a, b_b);
+                CheckSphereCapsule(pair.info, a_obj, b_obj, b_a, b_b);
                 break;
             case Object::Capsule | Object::Capsule:
-                CheckCapsuleCapsule(info.info, a_obj, b_obj, b_a, b_b);
+                CheckCapsuleCapsule(pair.info, a_obj, b_obj, b_a, b_b);
                 break;
             default:
                 break;
             };
 
             // collision found? stop checking the groups against eachother and early return.
-            if (info.info.collided) {
+            if (pair.info.collided) {
                 return;
             }
         }
