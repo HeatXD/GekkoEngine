@@ -74,6 +74,7 @@ namespace Gekko::Physics {
         // collision shapes
         DS::SparseSet<int16_t, Sphere> _spheres;
         DS::SparseSet<int16_t, Capsule> _capsules;
+        DS::SparseSet<int16_t, AABB> _aabbs;
 
         struct CInfo {
             bool collided, swapped;
@@ -143,6 +144,8 @@ namespace Gekko::Physics {
         void CheckSphereCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
 
         void CheckCapsuleCapsule(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
+
+        void CheckAABBAABB(CInfo& info, const Object* obj_a, const Object* obj_b, const Body* body_a, const Body* body_b);
 
         void CalculateDepthNorm(CInfo& info, const Math::Unit& distSq, const Math::Unit& radSum, const Math::Vec3& diff);
     };

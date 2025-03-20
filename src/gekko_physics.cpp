@@ -137,6 +137,9 @@ bool Gekko::Physics::World::AddObject(int16_t group_id, Object::Type type, int16
     case Gekko::Physics::Object::Capsule:
         shape_id = _capsules.insert(Capsule());
         break;
+    case Gekko::Physics::Object::AABB:
+        shape_id = _aabbs.insert(AABB());
+        break;
     default:
         break;
     }
@@ -174,6 +177,9 @@ bool Gekko::Physics::World::RemoveObject(int16_t group_id, int16_t object_id)
         break;
     case Gekko::Physics::Object::Capsule:
         _capsules.remove(obj.shape_id);
+        break;
+    case Gekko::Physics::Object::AABB:
+        _aabbs.remove(obj.shape_id);
         break;
     default:
         break;
@@ -217,7 +223,7 @@ bool Gekko::Physics::World::SetGroupState(int16_t group_id, bool state)
 
 void Gekko::Physics::World::Update()
 {
-    // apply first half of body movement
+    // apply body movement
     IntegrateBodies();
 
     // find collision pairs
@@ -453,6 +459,9 @@ void Gekko::Physics::World::DoGroupsCollide(
             case Object::Capsule | Object::Capsule:
                 CheckCapsuleCapsule(pair.info, a_obj, b_obj, b_a, b_b);
                 break;
+            case Object::AABB | Object::AABB:
+                CheckAABBAABB(pair.info, a_obj, b_obj, b_a, b_b);
+                break;
             default:
                 break;
             };
@@ -519,6 +528,13 @@ void Gekko::Physics::World::CheckCapsuleCapsule(
 {
     auto& cap_a = _capsules.get(obj_a->shape_id);
     auto& cap_b = _capsules.get(obj_b->shape_id);
+}
+
+void Gekko::Physics::World::CheckAABBAABB(
+    CInfo& info,
+    const Object* obj_a, const Object* obj_b,
+    const Body* body_a, const Body* body_b)
+{
 }
 
 void Gekko::Physics::World::CalculateDepthNorm(
