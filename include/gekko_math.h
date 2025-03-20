@@ -138,6 +138,14 @@ namespace Gekko::Math {
         }
     };
 
+    inline Unit Min(const Unit& a, const Unit& b) {
+        return (a < b) ? a : b;
+    }
+
+    inline Unit Max(const Unit& a, const Unit& b) {
+        return (a > b) ? a : b;
+    }
+
     // VISUALIZATION ONLY
     struct Vec3F {
         float x, y, z;

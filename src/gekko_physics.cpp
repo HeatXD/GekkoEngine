@@ -226,9 +226,6 @@ void Gekko::Physics::World::Update()
     // resolve the collision pairs
     ResolvePairs();
 
-    // apply remaining body movement
-    IntegrateBodies();
-
     // send out signals
     ReactPairs();
 }
@@ -352,7 +349,7 @@ void Gekko::Physics::World::ResolvePairs()
         const Math::Vec3 half_correction = correction * Math::Unit::HALF;
 
         if (pair.info.swapped) {
-            std::swap(body_a, body_b);
+            std::swap(body_a, body_b); 
             std::swap(a_resolve, b_resolve);
         }
 
@@ -381,15 +378,12 @@ void Gekko::Physics::World::ReactPairs()
 
 void Gekko::Physics::World::IntegrateBodies()
 {
-    // we do split integration for increase stability
-    // so this function will be called at the start and end of an iteration
     for (auto& body : _bodies) {
         if (body.is_static) {
             continue;
         }
-
-        body.velocity += body.acceleration * Math::Unit::HALF;
-        body.position += body.velocity * Math::Unit::HALF;
+        body.velocity += body.acceleration;
+        body.position += body.velocity;
     }
 }
 
@@ -534,7 +528,7 @@ void Gekko::Physics::World::CalculateDepthNorm(
     const Math::Vec3& diff)
 {
     static const auto def_norm = Math::Vec3(Math::Unit::ONE, Math::Unit(), Math::Unit());
-    static const auto zero = Math::Vec3(Math::Unit(), Math::Unit(), Math::Unit());
+    static const auto zero = Math::Vec3();
 
     // compute real distance
     const Math::Unit distance = Math::Unit::SqrtNewton(distSq);

@@ -15,6 +15,7 @@ namespace Gekko::Physics {
         enum Type : uint16_t {
             Sphere = 1 << 0,
             Capsule = 1 << 1,
+            AABB = 1 << 2,
         } type;
 
         int16_t shape_id;
@@ -51,6 +52,10 @@ namespace Gekko::Physics {
     struct Capsule {
         Math::Vec3 start, end;
         Math::Unit radius;
+    };
+
+    struct AABB {
+        Math::Vec3 min, max;
     };
 
     struct World {
