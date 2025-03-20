@@ -344,7 +344,8 @@ void Gekko::Physics::World::ResolvePairs()
         bool a_resolve = (group_b.group_layers & group_a.resolve_layers) && !body_a->is_static;
         bool b_resolve = (group_a.group_layers & group_b.resolve_layers) && !body_b->is_static;
 
-        if (a_resolve || b_resolve) {
+        // if we dont resolve anything just go next.
+        if (!a_resolve && !b_resolve) {
             continue;
         }
 
