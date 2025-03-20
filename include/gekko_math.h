@@ -57,6 +57,10 @@ namespace Gekko::Math {
             return _raw <= other;
         }
 
+        Unit operator-() const {
+            return Unit::From(-_raw);
+        }
+
         Unit operator+(const Unit& other) const {
             return Unit::From(_raw + other._raw);
         }

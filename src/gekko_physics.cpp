@@ -373,7 +373,30 @@ void Gekko::Physics::World::ResolvePairs()
             body_b->position += correction;
         }
 
-        // todo handle velocities
+        // handle velocities
+        const Math::Vec3 rel_vel = body_b->velocity - body_a->velocity;
+        const Math::Unit vel_on_norm = rel_vel.Dot(pair.info.normal);
+
+        // if theyre moving towards eachother we should act.
+        // because we dont want futher penetration
+        if (vel_on_norm < 0) {
+            const Math::Vec3 impulse = pair.info.normal * -vel_on_norm;
+            const Math::Vec3 half_impulse = impulse * Math::Unit::HALF;
+
+            if (a_resolve && b_resolve) {
+                // Apply half to each
+                body_a->velocity -= half_impulse;
+                body_b->velocity += half_impulse;
+            }
+            else if (a_resolve) {
+                body_a->velocity -= impulse;
+            }
+            else if (b_resolve) {
+                body_b->velocity += impulse;
+            }
+        }
+
+        // todo handle acceleration.
     }
 }
 
