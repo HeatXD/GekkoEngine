@@ -1,0 +1,9 @@
+[submodule "external/GekkoDS"]
+	path = external/GekkoDS
+	url = https://github.com/HeatXD/GekkoDS.git
+[submodule "external/GekkoMath"]
+	path = external/GekkoMath
+	url = https://github.com/HeatXD/GekkoMath.git
+[submodule "external/GekkoPhysics"]
+	path = external/GekkoPhysics
+	url = https://github.com/HeatXD/GekkoPhysics.git
