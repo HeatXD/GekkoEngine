@@ -1,3 +1,9 @@
 [submodule "GekkoPhysics"]
 	path = GekkoPhysics
 	url = https://github.com/HeatXD/GekkoPhysics.git
+[submodule "GekkoDS"]
+	path = GekkoDS
+	url = https://github.com/HeatXD/GekkoDS.git
+[submodule "GekkoMath"]
+	path = GekkoMath
+	url = https://github.com/HeatXD/GekkoMath.git
